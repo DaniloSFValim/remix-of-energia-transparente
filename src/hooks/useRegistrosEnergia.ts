@@ -85,10 +85,13 @@ export const useCreateRegistro = () => {
       toast.success('Registro criado com sucesso!');
     },
     onError: (error: Error) => {
+      console.error('Create registro error:', error);
       if (error.message.includes('duplicate key')) {
         toast.error('Já existe um registro para este mês/ano.');
+      } else if (error.message.includes('permission denied') || error.message.includes('row-level security')) {
+        toast.error('Você não tem permissão para criar registros.');
       } else {
-        toast.error('Erro ao criar registro: ' + error.message);
+        toast.error('Erro ao criar registro. Tente novamente.');
       }
     },
   });
@@ -114,7 +117,12 @@ export const useUpdateRegistro = () => {
       toast.success('Registro atualizado com sucesso!');
     },
     onError: (error: Error) => {
-      toast.error('Erro ao atualizar registro: ' + error.message);
+      console.error('Update registro error:', error);
+      if (error.message.includes('permission denied') || error.message.includes('row-level security')) {
+        toast.error('Você não tem permissão para atualizar registros.');
+      } else {
+        toast.error('Erro ao atualizar registro. Tente novamente.');
+      }
     },
   });
 };
@@ -137,7 +145,12 @@ export const useDeleteRegistro = () => {
       toast.success('Registro excluído com sucesso!');
     },
     onError: (error: Error) => {
-      toast.error('Erro ao excluir registro: ' + error.message);
+      console.error('Delete registro error:', error);
+      if (error.message.includes('permission denied') || error.message.includes('row-level security')) {
+        toast.error('Você não tem permissão para excluir registros.');
+      } else {
+        toast.error('Erro ao excluir registro. Tente novamente.');
+      }
     },
   });
 };
