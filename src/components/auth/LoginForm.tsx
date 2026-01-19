@@ -40,7 +40,14 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       if (isSignUp) {
         const { error } = await signUp(data.email, data.password);
         if (error) {
-          toast.error(error.message);
+          console.error('SignUp error:', error);
+          if (error.message.includes('already registered')) {
+            toast.error('Este email já está cadastrado.');
+          } else if (error.message.includes('invalid') || error.message.includes('weak')) {
+            toast.error('Senha inválida. Use uma senha mais forte.');
+          } else {
+            toast.error('Erro ao criar conta. Tente novamente.');
+          }
         } else {
           toast.success('Conta criada com sucesso!');
           onSuccess();
