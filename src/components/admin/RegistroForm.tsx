@@ -7,18 +7,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCreateRegistro, useUpdateRegistro } from '@/hooks/useRegistrosEnergia';
-import { RegistroEnergia, MESES, BANDEIRAS } from '@/types/energia';
+import { useCreateRegistro, useUpdateRegistro, useUltimoRegistro } from '@/hooks/useRegistrosEnergia';
+import { RegistroEnergia, MESES, BANDEIRAS, isBandeiraComCusto } from '@/types/energia';
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 const registroSchema = z.object({
   mes: z.number().min(1).max(12),
   ano: z.number().min(2000).max(2100),
   consumo_kwh: z.number().min(0, 'Consumo deve ser positivo'),
-  valor_faturado: z.number().min(0, 'Valor deve ser positivo'),
   valor_pago: z.number().min(0, 'Valor deve ser positivo'),
   bandeira_tarifaria: z.enum(['verde', 'amarela', 'vermelha_1', 'vermelha_2']),
-  valor_bandeira: z.number().min(0, 'Valor deve ser positivo'),
+  preco_te: z.number().min(0, 'Valor deve ser positivo'),
+  preco_tusd: z.number().min(0, 'Valor deve ser positivo'),
+  preco_bandeira: z.number().min(0, 'Valor deve ser positivo').optional(),
   observacoes: z.string().max(1000, 'Máximo de 1000 caracteres').optional(),
 });
 
@@ -33,31 +35,56 @@ interface RegistroFormProps {
 export const RegistroForm = ({ registro, onSuccess, onCancel }: RegistroFormProps) => {
   const createMutation = useCreateRegistro();
   const updateMutation = useUpdateRegistro();
+  const { data: ultimoRegistro } = useUltimoRegistro();
   const isEditing = !!registro;
+
+  // Calcular próximo mês/ano baseado no último registro
+  const getProximoMesAno = () => {
+    if (ultimoRegistro) {
+      const proximoMes = ultimoRegistro.mes === 12 ? 1 : ultimoRegistro.mes + 1;
+      const proximoAno = ultimoRegistro.mes === 12 ? ultimoRegistro.ano + 1 : ultimoRegistro.ano;
+      return { mes: proximoMes, ano: proximoAno };
+    }
+    return { mes: new Date().getMonth() + 1, ano: new Date().getFullYear() };
+  };
+
+  const proximoMesAno = getProximoMesAno();
 
   const form = useForm<RegistroFormData>({
     resolver: zodResolver(registroSchema),
     defaultValues: {
-      mes: registro?.mes || new Date().getMonth() + 1,
-      ano: registro?.ano || new Date().getFullYear(),
+      mes: registro?.mes || proximoMesAno.mes,
+      ano: registro?.ano || proximoMesAno.ano,
       consumo_kwh: registro ? Number(registro.consumo_kwh) : 0,
-      valor_faturado: registro ? Number(registro.valor_faturado) : 0,
       valor_pago: registro ? Number(registro.valor_pago) : 0,
       bandeira_tarifaria: registro?.bandeira_tarifaria || 'verde',
-      valor_bandeira: registro ? Number(registro.valor_bandeira || 0) : 0,
+      preco_te: registro ? Number(registro.preco_te || 0) : 0,
+      preco_tusd: registro ? Number(registro.preco_tusd || 0) : 0,
+      preco_bandeira: registro ? Number(registro.preco_bandeira || 0) : 0,
       observacoes: registro?.observacoes || '',
     },
   });
+
+  // Atualizar valores padrão quando ultimoRegistro carregar
+  useEffect(() => {
+    if (!isEditing && ultimoRegistro) {
+      const proximo = getProximoMesAno();
+      form.setValue('mes', proximo.mes);
+      form.setValue('ano', proximo.ano);
+    }
+  }, [ultimoRegistro, isEditing]);
 
   const onSubmit = async (data: RegistroFormData) => {
     const payload = {
       mes: data.mes,
       ano: data.ano,
       consumo_kwh: data.consumo_kwh,
-      valor_faturado: data.valor_faturado,
+      valor_faturado: 0, // Campo mantido para compatibilidade com banco
       valor_pago: data.valor_pago,
       bandeira_tarifaria: data.bandeira_tarifaria,
-      valor_bandeira: data.valor_bandeira,
+      preco_te: data.preco_te,
+      preco_tusd: data.preco_tusd,
+      preco_bandeira: isBandeiraComCusto(data.bandeira_tarifaria) ? data.preco_bandeira : undefined,
       observacoes: data.observacoes,
     };
 
@@ -76,6 +103,7 @@ export const RegistroForm = ({ registro, onSuccess, onCancel }: RegistroFormProp
   const isLoading = createMutation.isPending || updateMutation.isPending;
   const selectedBandeira = form.watch('bandeira_tarifaria');
   const bandeiraInfo = BANDEIRAS.find(b => b.valor === selectedBandeira);
+  const mostrarPrecoBandeira = isBandeiraComCusto(selectedBandeira);
 
   return (
     <Card className="animate-fade-in">
@@ -158,107 +186,136 @@ export const RegistroForm = ({ registro, onSuccess, onCancel }: RegistroFormProp
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="valor_faturado"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor Faturado (R$)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        placeholder="0.00"
-                        {...field} 
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="valor_pago"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor Pago (R$)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        placeholder="0.00"
-                        {...field} 
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="valor_pago"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor Pago (R$)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      step="0.01"
+                      placeholder="0.00"
+                      {...field} 
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            {/* Bandeira Tarifária Section */}
+            {/* Preços Unitários */}
             <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
-              <h4 className="font-medium text-sm">Bandeira Tarifária</h4>
+              <h4 className="font-medium text-sm">Preços Unitários (R$ com tributos)</h4>
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="bandeira_tarifaria"
+                  name="preco_te"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bandeira</FormLabel>
-                      <Select 
-                        value={field.value} 
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {BANDEIRAS.map((bandeira) => (
-                            <SelectItem key={bandeira.valor} value={bandeira.valor}>
-                              <div className="flex items-center gap-2">
-                                <span 
-                                  className="w-3 h-3 rounded-full" 
-                                  style={{ backgroundColor: bandeira.cor }}
-                                />
-                                {bandeira.nome}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {bandeiraInfo && (
-                        <FormDescription>{bandeiraInfo.descricao}</FormDescription>
-                      )}
+                      <FormLabel>Energia Ativa TE (R$)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.000001"
+                          placeholder="0.000000"
+                          {...field} 
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormDescription>Tarifa de Energia</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
-                  name="valor_bandeira"
+                  name="preco_tusd"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Adicional (R$)</FormLabel>
+                      <FormLabel>Energia Ativa TUSD (R$)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
-                          step="0.01"
-                          placeholder="0.00"
+                          step="0.000001"
+                          placeholder="0.000000"
                           {...field} 
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
+                      <FormDescription>Tarifa de Uso do Sistema</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+            </div>
+
+            {/* Bandeira Tarifária Section */}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+              <h4 className="font-medium text-sm">Bandeira Tarifária</h4>
+              <FormField
+                control={form.control}
+                name="bandeira_tarifaria"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bandeira</FormLabel>
+                    <Select 
+                      value={field.value} 
+                      onValueChange={field.onChange}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {BANDEIRAS.map((bandeira) => (
+                          <SelectItem key={bandeira.valor} value={bandeira.valor}>
+                            <div className="flex items-center gap-2">
+                              <span 
+                                className="w-3 h-3 rounded-full" 
+                                style={{ backgroundColor: bandeira.cor }}
+                              />
+                              {bandeira.nome}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {bandeiraInfo && (
+                      <FormDescription>{bandeiraInfo.descricao}</FormDescription>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {mostrarPrecoBandeira && (
+                <FormField
+                  control={form.control}
+                  name="preco_bandeira"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preço Unit. Bandeira (R$ com tributos)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.000001"
+                          placeholder="0.000000"
+                          {...field} 
+                          value={field.value || 0}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormDescription>Preço unitário por kWh devido à bandeira</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <FormField

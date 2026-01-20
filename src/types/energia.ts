@@ -11,6 +11,9 @@ export interface RegistroEnergia {
   user_id: string | null;
   bandeira_tarifaria: BandeiraTarifaria | null;
   valor_bandeira: number | null;
+  preco_te: number | null;
+  preco_tusd: number | null;
+  preco_bandeira: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -24,14 +27,15 @@ export interface RegistroEnergiaInsert {
   observacoes?: string | null;
   bandeira_tarifaria?: BandeiraTarifaria;
   valor_bandeira?: number;
+  preco_te?: number;
+  preco_tusd?: number;
+  preco_bandeira?: number;
 }
 
 export interface DadosKPI {
   consumoTotalAnual: number;
   gastoTotalAnual: number;
   mediaConsumoMensal: number;
-  diferencaFaturadoPago: number;
-  totalBandeira: number;
 }
 
 export const BANDEIRAS = [
@@ -68,4 +72,8 @@ export const MESES = [
 
 export const getNomeMes = (mes: number): string => {
   return MESES.find(m => m.valor === mes)?.nome || '';
+};
+
+export const isBandeiraComCusto = (bandeira: BandeiraTarifaria | null): boolean => {
+  return bandeira === 'amarela' || bandeira === 'vermelha_1' || bandeira === 'vermelha_2';
 };

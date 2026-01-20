@@ -1,19 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/dashboard/Header';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { GraficoConsumo } from '@/components/dashboard/GraficoConsumo';
 import { GraficoComparativo } from '@/components/dashboard/GraficoComparativo';
 import { FiltroAno } from '@/components/dashboard/FiltroAno';
-import { useRegistrosEnergia, useKPIs } from '@/hooks/useRegistrosEnergia';
-import { Zap, DollarSign, TrendingUp, ArrowRightLeft, Loader2, Flag, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { useRegistrosEnergia, useKPIs, useUltimoRegistro } from '@/hooks/useRegistrosEnergia';
+import { Zap, DollarSign, TrendingUp, Loader2, Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { exportToExcel, exportToPDF } from '@/utils/exportData';
 
 const Index = () => {
-  const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
-  const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado);
-  const kpis = useKPIs(anoSelecionado);
+  const { data: ultimoRegistro } = useUltimoRegistro();
+  const [anoSelecionado, setAnoSelecionado] = useState<number | null>(null);
+  
+  // Definir ano baseado no último registro quando carregar
+  useEffect(() => {
+    if (ultimoRegistro && anoSelecionado === null) {
+      setAnoSelecionado(ultimoRegistro.ano);
+    } else if (anoSelecionado === null) {
+      setAnoSelecionado(new Date().getFullYear());
+    }
+  }, [ultimoRegistro, anoSelecionado]);
+
+  const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado || new Date().getFullYear());
+  const kpis = useKPIs(anoSelecionado || new Date().getFullYear());
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -30,6 +41,14 @@ const Index = () => {
       maximumFractionDigits: 0,
     }).format(value);
   };
+
+  if (anoSelecionado === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -73,7 +92,7 @@ const Index = () => {
         ) : (
           <>
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               <KPICard
                 titulo="Consumo Total Anual"
                 valor={`${formatNumber(kpis.consumoTotalAnual)} kWh`}
@@ -94,20 +113,6 @@ const Index = () => {
                 subtitulo="Consumo médio por mês"
                 icon={TrendingUp}
                 variante="default"
-              />
-              <KPICard
-                titulo="Diferença Fat./Pago"
-                valor={formatCurrency(kpis.diferencaFaturadoPago)}
-                subtitulo={kpis.diferencaFaturadoPago >= 0 ? 'Economia' : 'Acréscimo'}
-                icon={ArrowRightLeft}
-                variante={kpis.diferencaFaturadoPago >= 0 ? 'success' : 'warning'}
-              />
-              <KPICard
-                titulo="Custo Bandeira"
-                valor={formatCurrency(kpis.totalBandeira)}
-                subtitulo="Adicional por bandeira"
-                icon={Flag}
-                variante={kpis.totalBandeira > 0 ? 'warning' : 'success'}
               />
             </div>
 

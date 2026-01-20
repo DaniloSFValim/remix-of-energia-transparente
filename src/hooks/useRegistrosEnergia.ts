@@ -54,17 +54,33 @@ export const useKPIs = (ano: number): DadosKPI => {
   const consumoTotalAnual = registros.reduce((acc, r) => acc + Number(r.consumo_kwh), 0);
   const gastoTotalAnual = registros.reduce((acc, r) => acc + Number(r.valor_pago), 0);
   const mediaConsumoMensal = registros.length > 0 ? consumoTotalAnual / registros.length : 0;
-  const totalFaturado = registros.reduce((acc, r) => acc + Number(r.valor_faturado), 0);
-  const diferencaFaturadoPago = totalFaturado - gastoTotalAnual;
-  const totalBandeira = registros.reduce((acc, r) => acc + Number(r.valor_bandeira || 0), 0);
 
   return {
     consumoTotalAnual,
     gastoTotalAnual,
     mediaConsumoMensal,
-    diferencaFaturadoPago,
-    totalBandeira,
   };
+};
+
+export const useUltimoRegistro = () => {
+  return useQuery({
+    queryKey: ['ultimo-registro'],
+    queryFn: async (): Promise<{ mes: number; ano: number } | null> => {
+      const { data, error } = await supabase
+        .from('registros_energia')
+        .select('mes, ano')
+        .order('ano', { ascending: false })
+        .order('mes', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (error) {
+        if (error.code === 'PGRST116') return null; // No rows
+        throw error;
+      }
+      return data;
+    },
+  });
 };
 
 export const useCreateRegistro = () => {
@@ -74,7 +90,7 @@ export const useCreateRegistro = () => {
     mutationFn: async (registro: RegistroEnergiaInsert) => {
       const { data, error } = await supabase
         .from('registros_energia')
-        .insert(registro)
+        .insert([registro])
         .select()
         .single();
       

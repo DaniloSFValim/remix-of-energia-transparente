@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { RegistroEnergia, getNomeMes, getNomeBandeira } from '@/types/energia';
+import { RegistroEnergia, getNomeMes, getNomeBandeira, isBandeiraComCusto } from '@/types/energia';
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -14,15 +14,26 @@ const formatNumber = (value: number) => {
   return new Intl.NumberFormat('pt-BR').format(value);
 };
 
+const formatPreco = (value: number | null) => {
+  if (value === null || value === 0) return '-';
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 6,
+    maximumFractionDigits: 6,
+  }).format(value);
+};
+
 export const exportToExcel = (registros: RegistroEnergia[], ano: number) => {
   const data = registros.map(r => ({
     'Mês': getNomeMes(r.mes),
     'Ano': r.ano,
     'Consumo (kWh)': Number(r.consumo_kwh),
-    'Valor Faturado (R$)': Number(r.valor_faturado),
     'Valor Pago (R$)': Number(r.valor_pago),
+    'TE (R$/kWh)': Number(r.preco_te || 0),
+    'TUSD (R$/kWh)': Number(r.preco_tusd || 0),
     'Bandeira': getNomeBandeira(r.bandeira_tarifaria),
-    'Valor Bandeira (R$)': Number(r.valor_bandeira || 0),
+    'Preço Bandeira (R$/kWh)': isBandeiraComCusto(r.bandeira_tarifaria) ? Number(r.preco_bandeira || 0) : 0,
     'Observações': r.observacoes || '',
   }));
 
@@ -61,35 +72,35 @@ export const exportToPDF = (registros: RegistroEnergia[], ano: number) => {
     .map(r => [
       getNomeMes(r.mes),
       formatNumber(Number(r.consumo_kwh)),
-      formatCurrency(Number(r.valor_faturado)),
       formatCurrency(Number(r.valor_pago)),
+      formatPreco(Number(r.preco_te || 0)),
+      formatPreco(Number(r.preco_tusd || 0)),
       getNomeBandeira(r.bandeira_tarifaria),
-      formatCurrency(Number(r.valor_bandeira || 0)),
+      isBandeiraComCusto(r.bandeira_tarifaria) ? formatPreco(Number(r.preco_bandeira || 0)) : '-',
     ]);
 
   // Summary
   const totalConsumo = registros.reduce((acc, r) => acc + Number(r.consumo_kwh), 0);
-  const totalFaturado = registros.reduce((acc, r) => acc + Number(r.valor_faturado), 0);
   const totalPago = registros.reduce((acc, r) => acc + Number(r.valor_pago), 0);
-  const totalBandeira = registros.reduce((acc, r) => acc + Number(r.valor_bandeira || 0), 0);
 
   tableData.push([
     'TOTAL',
     formatNumber(totalConsumo),
-    formatCurrency(totalFaturado),
     formatCurrency(totalPago),
     '-',
-    formatCurrency(totalBandeira),
+    '-',
+    '-',
+    '-',
   ]);
 
   autoTable(doc, {
-    head: [['Mês', 'Consumo (kWh)', 'Faturado', 'Pago', 'Bandeira', 'Valor Bandeira']],
+    head: [['Mês', 'Consumo (kWh)', 'Pago', 'TE', 'TUSD', 'Bandeira', 'Preço Band.']],
     body: tableData,
     startY: 50,
     theme: 'striped',
     headStyles: { fillColor: [59, 130, 246] },
     footStyles: { fillColor: [229, 231, 235], textColor: [0, 0, 0], fontStyle: 'bold' },
-    styles: { fontSize: 9 },
+    styles: { fontSize: 8 },
   });
 
   doc.save(`iluminacao-publica-${ano}.pdf`);
