@@ -11,17 +11,19 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { exportToExcel, exportToPDF } from '@/utils/exportData';
 
 const Index = () => {
-  const { data: ultimoRegistro } = useUltimoRegistro();
+  const { data: ultimoRegistro, isLoading: loadingUltimo } = useUltimoRegistro();
   const [anoSelecionado, setAnoSelecionado] = useState<number | null>(null);
   
   // Definir ano baseado no último registro quando carregar
   useEffect(() => {
-    if (ultimoRegistro && anoSelecionado === null) {
-      setAnoSelecionado(ultimoRegistro.ano);
-    } else if (anoSelecionado === null) {
-      setAnoSelecionado(new Date().getFullYear());
+    if (!loadingUltimo && anoSelecionado === null) {
+      if (ultimoRegistro) {
+        setAnoSelecionado(ultimoRegistro.ano);
+      } else {
+        setAnoSelecionado(new Date().getFullYear());
+      }
     }
-  }, [ultimoRegistro, anoSelecionado]);
+  }, [ultimoRegistro, loadingUltimo, anoSelecionado]);
 
   const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado || new Date().getFullYear());
   const kpis = useKPIs(anoSelecionado || new Date().getFullYear());
@@ -42,7 +44,7 @@ const Index = () => {
     }).format(value);
   };
 
-  if (anoSelecionado === null) {
+  if (anoSelecionado === null || loadingUltimo) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />

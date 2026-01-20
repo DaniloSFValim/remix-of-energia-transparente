@@ -16,17 +16,19 @@ interface RegistrosListProps {
 }
 
 export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
-  const { data: ultimoRegistro } = useUltimoRegistro();
+  const { data: ultimoRegistro, isLoading: loadingUltimo } = useUltimoRegistro();
   const [anoSelecionado, setAnoSelecionado] = useState<number | null>(null);
   
   // Definir ano baseado no último registro quando carregar
   useEffect(() => {
-    if (ultimoRegistro && anoSelecionado === null) {
-      setAnoSelecionado(ultimoRegistro.ano);
-    } else if (anoSelecionado === null) {
-      setAnoSelecionado(new Date().getFullYear());
+    if (!loadingUltimo && anoSelecionado === null) {
+      if (ultimoRegistro) {
+        setAnoSelecionado(ultimoRegistro.ano);
+      } else {
+        setAnoSelecionado(new Date().getFullYear());
+      }
     }
-  }, [ultimoRegistro, anoSelecionado]);
+  }, [ultimoRegistro, loadingUltimo, anoSelecionado]);
 
   const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado || new Date().getFullYear());
   const deleteMutation = useDeleteRegistro();
@@ -58,7 +60,7 @@ export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
 
   const registrosOrdenados = [...registros].sort((a, b) => b.mes - a.mes);
 
-  if (anoSelecionado === null) {
+  if (anoSelecionado === null || loadingUltimo) {
     return (
       <div className="flex items-center justify-center py-8">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
