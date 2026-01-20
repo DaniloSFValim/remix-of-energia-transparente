@@ -25,6 +25,9 @@ export type Database = {
           id: string
           mes: number
           observacoes: string | null
+          preco_bandeira: number | null
+          preco_te: number | null
+          preco_tusd: number | null
           updated_at: string
           user_id: string | null
           valor_bandeira: number | null
@@ -41,6 +44,9 @@ export type Database = {
           id?: string
           mes: number
           observacoes?: string | null
+          preco_bandeira?: number | null
+          preco_te?: number | null
+          preco_tusd?: number | null
           updated_at?: string
           user_id?: string | null
           valor_bandeira?: number | null
@@ -57,6 +63,9 @@ export type Database = {
           id?: string
           mes?: number
           observacoes?: string | null
+          preco_bandeira?: number | null
+          preco_te?: number | null
+          preco_tusd?: number | null
           updated_at?: string
           user_id?: string | null
           valor_bandeira?: number | null

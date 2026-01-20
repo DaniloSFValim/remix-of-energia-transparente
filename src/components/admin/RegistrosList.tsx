@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { useRegistrosEnergia, useDeleteRegistro } from '@/hooks/useRegistrosEnergia';
-import { RegistroEnergia, getNomeMes } from '@/types/energia';
+import { useRegistrosEnergia, useDeleteRegistro, useUltimoRegistro } from '@/hooks/useRegistrosEnergia';
+import { RegistroEnergia, getNomeMes, isBandeiraComCusto } from '@/types/energia';
 import { Pencil, Trash2, Loader2, Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { FiltroAno } from '@/components/dashboard/FiltroAno';
 import { BandeiraBadge } from '@/components/dashboard/BandeiraBadge';
@@ -16,8 +16,19 @@ interface RegistrosListProps {
 }
 
 export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
-  const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
-  const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado);
+  const { data: ultimoRegistro } = useUltimoRegistro();
+  const [anoSelecionado, setAnoSelecionado] = useState<number | null>(null);
+  
+  // Definir ano baseado no último registro quando carregar
+  useEffect(() => {
+    if (ultimoRegistro && anoSelecionado === null) {
+      setAnoSelecionado(ultimoRegistro.ano);
+    } else if (anoSelecionado === null) {
+      setAnoSelecionado(new Date().getFullYear());
+    }
+  }, [ultimoRegistro, anoSelecionado]);
+
+  const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado || new Date().getFullYear());
   const deleteMutation = useDeleteRegistro();
 
   const formatCurrency = (value: number) => {
@@ -31,11 +42,29 @@ export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
     return new Intl.NumberFormat('pt-BR').format(value);
   };
 
+  const formatPreco = (value: number | null) => {
+    if (value === null || value === 0) return '-';
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 6,
+      maximumFractionDigits: 6,
+    }).format(value);
+  };
+
   const handleDelete = async (id: string) => {
     await deleteMutation.mutateAsync(id);
   };
 
   const registrosOrdenados = [...registros].sort((a, b) => b.mes - a.mes);
+
+  if (anoSelecionado === null) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <Card className="animate-fade-in">
@@ -83,10 +112,11 @@ export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
                 <TableRow>
                   <TableHead>Mês</TableHead>
                   <TableHead className="text-right">Consumo (kWh)</TableHead>
-                  <TableHead className="text-right">Valor Faturado</TableHead>
                   <TableHead className="text-right">Valor Pago</TableHead>
+                  <TableHead className="text-right">TE (R$/kWh)</TableHead>
+                  <TableHead className="text-right">TUSD (R$/kWh)</TableHead>
                   <TableHead className="text-center">Bandeira</TableHead>
-                  <TableHead className="text-right">Adicional</TableHead>
+                  <TableHead className="text-right">Preço Band.</TableHead>
                   <TableHead className="w-[100px]">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -100,16 +130,22 @@ export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
                       {formatNumber(Number(registro.consumo_kwh))}
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatCurrency(Number(registro.valor_faturado))}
-                    </TableCell>
-                    <TableCell className="text-right">
                       {formatCurrency(Number(registro.valor_pago))}
+                    </TableCell>
+                    <TableCell className="text-right text-sm">
+                      {formatPreco(Number(registro.preco_te || 0))}
+                    </TableCell>
+                    <TableCell className="text-right text-sm">
+                      {formatPreco(Number(registro.preco_tusd || 0))}
                     </TableCell>
                     <TableCell className="text-center">
                       <BandeiraBadge bandeira={registro.bandeira_tarifaria} size="sm" />
                     </TableCell>
-                    <TableCell className="text-right">
-                      {formatCurrency(Number(registro.valor_bandeira || 0))}
+                    <TableCell className="text-right text-sm">
+                      {isBandeiraComCusto(registro.bandeira_tarifaria) 
+                        ? formatPreco(Number(registro.preco_bandeira || 0))
+                        : '-'
+                      }
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
