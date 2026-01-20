@@ -3,6 +3,7 @@ import { Header } from '@/components/dashboard/Header';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { GraficoConsumo } from '@/components/dashboard/GraficoConsumo';
 import { GraficoComparativo } from '@/components/dashboard/GraficoComparativo';
+import { CardMesAtual } from '@/components/dashboard/CardMesAtual';
 import { FiltroAno } from '@/components/dashboard/FiltroAno';
 import { useRegistrosEnergia, useKPIs, useUltimoRegistro } from '@/hooks/useRegistrosEnergia';
 import { Zap, DollarSign, TrendingUp, Loader2, Download, FileSpreadsheet, FileText } from 'lucide-react';
@@ -27,6 +28,11 @@ const Index = () => {
 
   const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado || new Date().getFullYear());
   const kpis = useKPIs(anoSelecionado || new Date().getFullYear());
+
+  // Encontrar o registro mais recente do ano selecionado
+  const registroMaisRecente = registros.length > 0 
+    ? registros.reduce((a, b) => (a.mes > b.mes ? a : b))
+    : null;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -58,7 +64,7 @@ const Index = () => {
       
       <main className="container mx-auto px-4 py-8">
         {/* Título e Filtros */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-2xl font-bold">Dashboard de Consumo</h2>
             <p className="text-muted-foreground">
@@ -93,7 +99,14 @@ const Index = () => {
           </div>
         ) : (
           <>
-            {/* KPIs */}
+            {/* Card do Mês Mais Recente em Destaque */}
+            {registroMaisRecente && (
+              <div className="mb-8">
+                <CardMesAtual registro={registroMaisRecente} />
+              </div>
+            )}
+
+            {/* KPIs Anuais */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               <KPICard
                 titulo="Consumo Total Anual"
