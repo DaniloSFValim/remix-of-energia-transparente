@@ -29,10 +29,10 @@ const Index = () => {
   const { data: registros = [], isLoading } = useRegistrosEnergia(anoSelecionado || new Date().getFullYear());
   const kpis = useKPIs(anoSelecionado || new Date().getFullYear());
 
-  // Encontrar o registro mais recente do ano selecionado
-  const registroMaisRecente = registros.length > 0 
-    ? registros.reduce((a, b) => (a.mes > b.mes ? a : b))
-    : null;
+  // Encontrar o registro mais recente e o anterior para comparação
+  const registrosOrdenados = [...registros].sort((a, b) => b.mes - a.mes);
+  const registroMaisRecente = registrosOrdenados.length > 0 ? registrosOrdenados[0] : null;
+  const registroAnterior = registrosOrdenados.length > 1 ? registrosOrdenados[1] : null;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -102,7 +102,7 @@ const Index = () => {
             {/* Card do Mês Mais Recente em Destaque */}
             {registroMaisRecente && (
               <div className="mb-8">
-                <CardMesAtual registro={registroMaisRecente} />
+                <CardMesAtual registro={registroMaisRecente} registroAnterior={registroAnterior} />
               </div>
             )}
 
