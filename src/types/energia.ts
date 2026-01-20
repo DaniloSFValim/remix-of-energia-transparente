@@ -1,3 +1,5 @@
+export type BandeiraTarifaria = 'verde' | 'amarela' | 'vermelha_1' | 'vermelha_2';
+
 export interface RegistroEnergia {
   id: string;
   mes: number;
@@ -7,6 +9,8 @@ export interface RegistroEnergia {
   valor_pago: number;
   observacoes: string | null;
   user_id: string | null;
+  bandeira_tarifaria: BandeiraTarifaria | null;
+  valor_bandeira: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -18,6 +22,8 @@ export interface RegistroEnergiaInsert {
   valor_faturado: number;
   valor_pago: number;
   observacoes?: string | null;
+  bandeira_tarifaria?: BandeiraTarifaria;
+  valor_bandeira?: number;
 }
 
 export interface DadosKPI {
@@ -25,7 +31,25 @@ export interface DadosKPI {
   gastoTotalAnual: number;
   mediaConsumoMensal: number;
   diferencaFaturadoPago: number;
+  totalBandeira: number;
 }
+
+export const BANDEIRAS = [
+  { valor: 'verde' as const, nome: 'Verde', cor: '#22c55e', descricao: 'Sem custo adicional' },
+  { valor: 'amarela' as const, nome: 'Amarela', cor: '#eab308', descricao: 'Custo baixo' },
+  { valor: 'vermelha_1' as const, nome: 'Vermelha P1', cor: '#ef4444', descricao: 'Custo moderado' },
+  { valor: 'vermelha_2' as const, nome: 'Vermelha P2', cor: '#dc2626', descricao: 'Custo alto' },
+] as const;
+
+export const getNomeBandeira = (bandeira: BandeiraTarifaria | null): string => {
+  if (!bandeira) return 'Verde';
+  return BANDEIRAS.find(b => b.valor === bandeira)?.nome || 'Verde';
+};
+
+export const getCorBandeira = (bandeira: BandeiraTarifaria | null): string => {
+  if (!bandeira) return '#22c55e';
+  return BANDEIRAS.find(b => b.valor === bandeira)?.cor || '#22c55e';
+};
 
 export const MESES = [
   { valor: 1, nome: 'Janeiro' },

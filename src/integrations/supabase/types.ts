@@ -17,6 +17,9 @@ export type Database = {
       registros_energia: {
         Row: {
           ano: number
+          bandeira_tarifaria:
+            | Database["public"]["Enums"]["bandeira_tarifaria"]
+            | null
           consumo_kwh: number
           created_at: string
           id: string
@@ -24,11 +27,15 @@ export type Database = {
           observacoes: string | null
           updated_at: string
           user_id: string | null
+          valor_bandeira: number | null
           valor_faturado: number
           valor_pago: number
         }
         Insert: {
           ano: number
+          bandeira_tarifaria?:
+            | Database["public"]["Enums"]["bandeira_tarifaria"]
+            | null
           consumo_kwh: number
           created_at?: string
           id?: string
@@ -36,11 +43,15 @@ export type Database = {
           observacoes?: string | null
           updated_at?: string
           user_id?: string | null
+          valor_bandeira?: number | null
           valor_faturado: number
           valor_pago: number
         }
         Update: {
           ano?: number
+          bandeira_tarifaria?:
+            | Database["public"]["Enums"]["bandeira_tarifaria"]
+            | null
           consumo_kwh?: number
           created_at?: string
           id?: string
@@ -48,6 +59,7 @@ export type Database = {
           observacoes?: string | null
           updated_at?: string
           user_id?: string | null
+          valor_bandeira?: number | null
           valor_faturado?: number
           valor_pago?: number
         }
@@ -89,6 +101,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      bandeira_tarifaria: "verde" | "amarela" | "vermelha_1" | "vermelha_2"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -217,6 +230,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      bandeira_tarifaria: ["verde", "amarela", "vermelha_1", "vermelha_2"],
     },
   },
 } as const

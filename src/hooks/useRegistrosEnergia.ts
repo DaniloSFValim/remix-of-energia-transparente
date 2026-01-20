@@ -56,12 +56,14 @@ export const useKPIs = (ano: number): DadosKPI => {
   const mediaConsumoMensal = registros.length > 0 ? consumoTotalAnual / registros.length : 0;
   const totalFaturado = registros.reduce((acc, r) => acc + Number(r.valor_faturado), 0);
   const diferencaFaturadoPago = totalFaturado - gastoTotalAnual;
+  const totalBandeira = registros.reduce((acc, r) => acc + Number(r.valor_bandeira || 0), 0);
 
   return {
     consumoTotalAnual,
     gastoTotalAnual,
     mediaConsumoMensal,
     diferencaFaturadoPago,
+    totalBandeira,
   };
 };
 

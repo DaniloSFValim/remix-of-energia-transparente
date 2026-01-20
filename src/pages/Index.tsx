@@ -5,7 +5,10 @@ import { GraficoConsumo } from '@/components/dashboard/GraficoConsumo';
 import { GraficoComparativo } from '@/components/dashboard/GraficoComparativo';
 import { FiltroAno } from '@/components/dashboard/FiltroAno';
 import { useRegistrosEnergia, useKPIs } from '@/hooks/useRegistrosEnergia';
-import { Zap, DollarSign, TrendingUp, ArrowRightLeft, Loader2 } from 'lucide-react';
+import { Zap, DollarSign, TrendingUp, ArrowRightLeft, Loader2, Flag, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { exportToExcel, exportToPDF } from '@/utils/exportData';
 
 const Index = () => {
   const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
@@ -41,7 +44,26 @@ const Index = () => {
               Acompanhe o consumo e gastos com iluminação pública
             </p>
           </div>
-          <FiltroAno anoSelecionado={anoSelecionado} onAnoChange={setAnoSelecionado} />
+          <div className="flex items-center gap-2">
+            <FiltroAno anoSelecionado={anoSelecionado} onAnoChange={setAnoSelecionado} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" disabled={registros.length === 0}>
+                  <Download className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => exportToExcel(registros, anoSelecionado)}>
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Exportar Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportToPDF(registros, anoSelecionado)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Exportar PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {isLoading ? (
@@ -51,7 +73,7 @@ const Index = () => {
         ) : (
           <>
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
               <KPICard
                 titulo="Consumo Total Anual"
                 valor={`${formatNumber(kpis.consumoTotalAnual)} kWh`}
@@ -79,6 +101,13 @@ const Index = () => {
                 subtitulo={kpis.diferencaFaturadoPago >= 0 ? 'Economia' : 'Acréscimo'}
                 icon={ArrowRightLeft}
                 variante={kpis.diferencaFaturadoPago >= 0 ? 'success' : 'warning'}
+              />
+              <KPICard
+                titulo="Custo Bandeira"
+                valor={formatCurrency(kpis.totalBandeira)}
+                subtitulo="Adicional por bandeira"
+                icon={Flag}
+                variante={kpis.totalBandeira > 0 ? 'warning' : 'success'}
               />
             </div>
 

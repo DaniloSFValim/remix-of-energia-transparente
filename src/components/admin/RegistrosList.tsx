@@ -5,8 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useRegistrosEnergia, useDeleteRegistro } from '@/hooks/useRegistrosEnergia';
 import { RegistroEnergia, getNomeMes } from '@/types/energia';
-import { Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Pencil, Trash2, Loader2, Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { FiltroAno } from '@/components/dashboard/FiltroAno';
+import { BandeiraBadge } from '@/components/dashboard/BandeiraBadge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { exportToExcel, exportToPDF } from '@/utils/exportData';
 
 interface RegistrosListProps {
   onEdit: (registro: RegistroEnergia) => void;
@@ -37,12 +40,31 @@ export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
   return (
     <Card className="animate-fade-in">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <CardTitle>Registros Mensais</CardTitle>
             <CardDescription>Gerencie os dados de consumo e valores</CardDescription>
           </div>
-          <FiltroAno anoSelecionado={anoSelecionado} onAnoChange={setAnoSelecionado} />
+          <div className="flex items-center gap-2">
+            <FiltroAno anoSelecionado={anoSelecionado} onAnoChange={setAnoSelecionado} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" disabled={registros.length === 0}>
+                  <Download className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => exportToExcel(registros, anoSelecionado)}>
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                  Exportar Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportToPDF(registros, anoSelecionado)}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Exportar PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -63,6 +85,8 @@ export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
                   <TableHead className="text-right">Consumo (kWh)</TableHead>
                   <TableHead className="text-right">Valor Faturado</TableHead>
                   <TableHead className="text-right">Valor Pago</TableHead>
+                  <TableHead className="text-center">Bandeira</TableHead>
+                  <TableHead className="text-right">Adicional</TableHead>
                   <TableHead className="w-[100px]">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -80,6 +104,12 @@ export const RegistrosList = ({ onEdit }: RegistrosListProps) => {
                     </TableCell>
                     <TableCell className="text-right">
                       {formatCurrency(Number(registro.valor_pago))}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <BandeiraBadge bandeira={registro.bandeira_tarifaria} size="sm" />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatCurrency(Number(registro.valor_bandeira || 0))}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
