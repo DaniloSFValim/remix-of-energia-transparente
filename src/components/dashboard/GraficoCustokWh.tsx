@@ -2,8 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Brush } from 'recharts';
 import { RegistroEnergia, getMesAbreviado } from '@/types/energia';
 import { useState } from 'react';
-import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FullscreenChart } from './FullscreenChart';
 
 interface GraficoCustokWhProps {
   registros: RegistroEnergia[];
@@ -113,6 +114,42 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleReset} title="Resetar Zoom">
               <RotateCcw className="h-4 w-4" />
             </Button>
+            <FullscreenChart 
+              title="Evolução do Custo por kWh" 
+              icon={<Calculator className="h-5 w-5 text-purple-500" />}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={dados} margin={{ top: 20, right: 60, left: 20, bottom: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
+                  <XAxis 
+                    dataKey="periodo" 
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    axisLine={{ stroke: 'hsl(var(--border))' }}
+                  />
+                  <YAxis 
+                    tickFormatter={(value) => `R$ ${value.toFixed(2)}`}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    domain={[(dataMin: number) => Math.floor((dataMin - 0.05) * 100) / 100, (dataMax: number) => Math.ceil((dataMax + 0.05) * 100) / 100]}
+                    axisLine={{ stroke: 'hsl(var(--border))' }}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeDasharray: '5 5' }} />
+                  <ReferenceLine 
+                    y={mediaCusto} 
+                    stroke="hsl(var(--muted-foreground))" 
+                    strokeDasharray="5 5" 
+                    label={{ value: `Média: R$ ${mediaCusto.toFixed(2)}`, fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="custo" 
+                    stroke="#a855f7" 
+                    strokeWidth={3}
+                    dot={<CustomDot />}
+                    activeDot={{ r: 8, stroke: '#a855f7', strokeWidth: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </FullscreenChart>
           </div>
         </div>
       </CardHeader>
