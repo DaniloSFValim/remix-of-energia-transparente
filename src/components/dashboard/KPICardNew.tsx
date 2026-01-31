@@ -1,4 +1,4 @@
-import { LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { LucideIcon, TrendingUp, TrendingDown, Minus, ArrowUp, ArrowDown, ChevronUp, ChevronDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -17,6 +17,7 @@ interface KPICardNewProps {
   iconColor?: string;
   tooltipText?: string;
   index?: number;
+  inverterCor?: boolean; // Para métricas onde aumento é bom (ex: economia)
 }
 
 export const KPICardNew = ({
@@ -33,20 +34,47 @@ export const KPICardNew = ({
   iconColor = 'text-primary',
   tooltipText,
   index = 0,
+  inverterCor = false,
 }: KPICardNewProps) => {
   const getVariacaoColor = () => {
     if (variacao === null || variacao === undefined) return 'text-muted-foreground';
-    return variacao < 0 ? 'text-emerald-400' : variacao > 0 ? 'text-red-400' : 'text-muted-foreground';
+    const isPositive = variacao > 0;
+    const isNegative = variacao < 0;
+    
+    if (inverterCor) {
+      return isNegative ? 'text-red-400' : isPositive ? 'text-emerald-400' : 'text-muted-foreground';
+    }
+    return isNegative ? 'text-emerald-400' : isPositive ? 'text-red-400' : 'text-muted-foreground';
+  };
+
+  const getVariacaoBgColor = () => {
+    if (variacao === null || variacao === undefined) return 'bg-muted';
+    const isPositive = variacao > 0;
+    const isNegative = variacao < 0;
+    
+    if (inverterCor) {
+      return isNegative ? 'bg-red-500/15' : isPositive ? 'bg-emerald-500/15' : 'bg-muted';
+    }
+    return isNegative ? 'bg-emerald-500/15' : isPositive ? 'bg-red-500/15' : 'bg-muted';
   };
 
   const getVariacaoIcon = () => {
     if (variacao === null || variacao === undefined) return Minus;
-    if (variacao < 0) return TrendingDown;
-    if (variacao > 0) return TrendingUp;
+    if (variacao < 0) return ArrowDown;
+    if (variacao > 0) return ArrowUp;
     return Minus;
   };
 
+  const getTrendIcon = () => {
+    if (variacao === null || variacao === undefined) return Minus;
+    if (Math.abs(variacao) > 10) {
+      return variacao > 0 ? ChevronUp : ChevronDown;
+    }
+    return variacao > 0 ? TrendingUp : variacao < 0 ? TrendingDown : Minus;
+  };
+
   const VariacaoIcon = getVariacaoIcon();
+  const TrendIcon = getTrendIcon();
 
   const getIconBgColor = () => {
     if (iconColor.includes('emerald') || iconColor.includes('green')) return 'bg-emerald-500/20';
@@ -66,6 +94,15 @@ export const KPICardNew = ({
     if (iconColor.includes('orange')) return 'hover:shadow-orange-500/20';
     if (iconColor.includes('red')) return 'hover:shadow-red-500/20';
     return 'hover:shadow-primary/20';
+  };
+
+  const getIntensityLabel = () => {
+    if (variacao === null || variacao === undefined) return '';
+    const absVariacao = Math.abs(variacao);
+    if (absVariacao > 20) return 'Variação alta';
+    if (absVariacao > 10) return 'Variação moderada';
+    if (absVariacao > 5) return 'Variação leve';
+    return 'Estável';
   };
 
   const cardContent = (
@@ -97,15 +134,42 @@ export const KPICardNew = ({
           </div>
           <div className="flex items-center gap-2">
             {variacao !== null && variacao !== undefined && (
-              <div className={cn(
-                "flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full",
-                "transition-all duration-300 group-hover:scale-105",
-                variacao < 0 ? 'bg-emerald-500/10' : variacao > 0 ? 'bg-red-500/10' : 'bg-muted',
-                getVariacaoColor()
-              )}>
-                <VariacaoIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-y-px" />
-                <span>{variacao > 0 ? '+' : ''}{variacao.toFixed(1)}%</span>
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className={cn(
+                    "flex items-center gap-1.5 text-sm font-semibold px-2.5 py-1 rounded-full",
+                    "transition-all duration-300 group-hover:scale-105",
+                    "border border-transparent",
+                    getVariacaoBgColor(),
+                    getVariacaoColor(),
+                    variacao !== 0 && "shadow-sm"
+                  )}>
+                    {/* Animated Arrow Indicator */}
+                    <div className={cn(
+                      "relative flex items-center justify-center",
+                      variacao !== 0 && "animate-bounce-subtle"
+                    )}>
+                      <VariacaoIcon className={cn(
+                        "h-4 w-4 transition-all duration-300",
+                        variacao > 0 && "drop-shadow-[0_0_3px_rgba(239,68,68,0.5)]",
+                        variacao < 0 && !inverterCor && "drop-shadow-[0_0_3px_rgba(34,197,94,0.5)]",
+                        variacao < 0 && inverterCor && "drop-shadow-[0_0_3px_rgba(239,68,68,0.5)]",
+                        variacao > 0 && inverterCor && "drop-shadow-[0_0_3px_rgba(34,197,94,0.5)]"
+                      )} />
+                    </div>
+                    <span className="tabular-nums">
+                      {variacao > 0 ? '+' : ''}{variacao.toFixed(1)}%
+                    </span>
+                    {/* Mini trend icon for large variations */}
+                    {Math.abs(variacao) > 10 && (
+                      <TrendIcon className="h-3 w-3 opacity-70" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <p>{getIntensityLabel()}</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {badge && (
               <span 
@@ -125,20 +189,42 @@ export const KPICardNew = ({
           {titulo}
         </p>
         
-        <p className={cn(
-          "text-2xl font-bold tracking-tight transition-all duration-300",
-          "group-hover:tracking-normal",
-          destaque && destaqueColor === 'yellow' && "text-yellow-400",
-          destaque && destaqueColor === 'green' && "text-emerald-400",
-          destaque && destaqueColor === 'red' && "text-red-400",
-          !destaque && iconColor.includes('emerald') && "text-emerald-400",
-          !destaque && iconColor.includes('blue') && "text-blue-400",
-          !destaque && iconColor.includes('purple') && "text-purple-400",
-          !destaque && iconColor.includes('orange') && "text-orange-400",
-          !destaque && !iconColor.includes('emerald') && !iconColor.includes('blue') && !iconColor.includes('purple') && !iconColor.includes('orange') && "text-foreground"
-        )}>
-          {valor}
-        </p>
+        <div className="flex items-end gap-2">
+          <p className={cn(
+            "text-2xl font-bold tracking-tight transition-all duration-300",
+            "group-hover:tracking-normal",
+            destaque && destaqueColor === 'yellow' && "text-yellow-400",
+            destaque && destaqueColor === 'green' && "text-emerald-400",
+            destaque && destaqueColor === 'red' && "text-red-400",
+            !destaque && iconColor.includes('emerald') && "text-emerald-400",
+            !destaque && iconColor.includes('blue') && "text-blue-400",
+            !destaque && iconColor.includes('purple') && "text-purple-400",
+            !destaque && iconColor.includes('orange') && "text-orange-400",
+            !destaque && !iconColor.includes('emerald') && !iconColor.includes('blue') && !iconColor.includes('purple') && !iconColor.includes('orange') && "text-foreground"
+          )}>
+            {valor}
+          </p>
+          
+          {/* Inline mini trend indicator */}
+          {variacao !== null && variacao !== undefined && variacao !== 0 && (
+            <div className={cn(
+              "flex items-center mb-1 transition-opacity duration-300",
+              "opacity-60 group-hover:opacity-100"
+            )}>
+              {variacao > 0 ? (
+                <ChevronUp className={cn(
+                  "h-5 w-5",
+                  inverterCor ? "text-emerald-400" : "text-red-400"
+                )} />
+              ) : (
+                <ChevronDown className={cn(
+                  "h-5 w-5",
+                  inverterCor ? "text-red-400" : "text-emerald-400"
+                )} />
+              )}
+            </div>
+          )}
+        </div>
         
         {subtitulo && (
           <p className="text-xs text-muted-foreground mt-1.5 transition-opacity duration-300 group-hover:opacity-80">
@@ -146,7 +232,8 @@ export const KPICardNew = ({
           </p>
         )}
         {variacaoLabel && (
-          <p className="text-xs text-muted-foreground mt-1 transition-opacity duration-300 group-hover:opacity-80">
+          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1 transition-opacity duration-300 group-hover:opacity-80">
+            <TrendIcon className="h-3 w-3" />
             {variacaoLabel}
           </p>
         )}
