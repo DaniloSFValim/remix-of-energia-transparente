@@ -156,6 +156,8 @@ const Index = () => {
                 valor={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ultimoReg.valor_pago))}
                 variacao={variacaoGasto}
                 variacaoLabel="vs mês anterior"
+                iconColor="text-emerald-500"
+                tooltipText="Valor total pago na fatura de energia do mês"
               />
               <KPICardNew
                 icon={Zap}
@@ -163,6 +165,8 @@ const Index = () => {
                 valor={`${new Intl.NumberFormat('pt-BR').format(Number(ultimoReg.consumo_kwh))} kWh`}
                 variacao={variacaoConsumo}
                 variacaoLabel="vs mês anterior"
+                iconColor="text-blue-500"
+                tooltipText="Consumo total de energia em quilowatts-hora"
               />
               <KPICardNew
                 icon={Calculator}
@@ -170,6 +174,8 @@ const Index = () => {
                 valor={`R$ ${custokWhAtual.toFixed(2)}`}
                 subtitulo="Com impostos inclusos"
                 variacao={variacaoCusto}
+                iconColor="text-purple-500"
+                tooltipText="Custo médio por kWh incluindo todos os impostos e taxas"
               />
               <KPICardNew
                 icon={Flag}
@@ -186,6 +192,8 @@ const Index = () => {
                 badgeColor={getCorBandeira(ultimoReg.bandeira_tarifaria)}
                 destaque={isBandeiraComCusto(ultimoReg.bandeira_tarifaria)}
                 destaqueColor={ultimoReg.bandeira_tarifaria === 'amarela' ? 'yellow' : 'red'}
+                iconColor={ultimoReg.bandeira_tarifaria === 'amarela' ? 'text-yellow-500' : ultimoReg.bandeira_tarifaria?.includes('vermelha') ? 'text-red-500' : 'text-emerald-500'}
+                tooltipText="Bandeira tarifária aplicada pela ANEEL no período"
               />
               <KPICardNew
                 icon={BarChart3}
@@ -196,6 +204,8 @@ const Index = () => {
                 }
                 subtitulo="vs mesmo mês ano anterior"
                 variacao={variacaoAnualPercent}
+                iconColor="text-orange-500"
+                tooltipText="Comparação com o mesmo mês do ano anterior"
               />
             </div>
 
@@ -205,11 +215,14 @@ const Index = () => {
             </div>
 
             {/* Gráficos */}
-            <div className="space-y-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <GraficoEvolucaoConsumo registros={registrosFiltrados} />
-              <GraficoCOSIP registros={registrosFiltrados} />
-              <GraficoCustokWh registros={registrosFiltrados} />
               <GraficoValores registros={registrosFiltrados} />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <GraficoCustokWh registros={registrosFiltrados} />
+              <GraficoCOSIP registros={registrosFiltrados} />
             </div>
 
             {/* Análises COSIP */}
