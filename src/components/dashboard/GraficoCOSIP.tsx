@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { RegistroEnergia, getMesAbreviado } from '@/types/energia';
 
 interface GraficoCOSIPProps {
@@ -68,32 +68,32 @@ export const GraficoCOSIP = ({ registros }: GraficoCOSIPProps) => {
   };
 
   return (
-    <Card className="animate-fade-in bg-card border-border hover:border-primary/30 transition-all duration-300">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold">Contribuição COSIP</CardTitle>
         <CardDescription>Evolução da Contribuição para Custeio do Serviço de Iluminação Pública</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4 bg-muted/50">
-            <TabsTrigger value="faturamento" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+          <TabsList className="mb-4 bg-muted/30">
+            <TabsTrigger value="faturamento" className="data-[state=active]:bg-card">
               Faturamento e Arrecadação
             </TabsTrigger>
-            <TabsTrigger value="clientes" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger value="clientes" className="data-[state=active]:bg-card">
               Clientes Faturados
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="faturamento">
-            <div className="h-[280px]">
+            <div className="h-[300px]">
               {dadosFaturamento.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
                   Nenhum dado disponível
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={dadosFaturamento} margin={{ top: 10, right: 40, left: 10, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                  <LineChart data={dadosFaturamento} margin={{ top: 10, right: 50, left: 10, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
                     <XAxis 
                       dataKey="periodo" 
                       tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
@@ -103,7 +103,7 @@ export const GraficoCOSIP = ({ registros }: GraficoCOSIPProps) => {
                     <YAxis 
                       tickFormatter={formatYAxis}
                       tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
-                      domain={[(dataMin: number) => Math.floor(dataMin * 0.95), (dataMax: number) => Math.ceil(dataMax * 1.05)]}
+                      domain={[(dataMin: number) => Math.floor(dataMin * 0.9), (dataMax: number) => Math.ceil(dataMax * 1.1)]}
                       tickCount={6}
                       axisLine={{ stroke: 'hsl(var(--border))' }}
                     />
@@ -112,7 +112,7 @@ export const GraficoCOSIP = ({ registros }: GraficoCOSIPProps) => {
                       y={mediaFaturado} 
                       stroke="hsl(var(--muted-foreground))" 
                       strokeDasharray="8 4"
-                      strokeWidth={1.5}
+                      strokeWidth={1}
                       label={{ 
                         value: 'Média', 
                         fill: 'hsl(var(--muted-foreground))', 
@@ -125,44 +125,44 @@ export const GraficoCOSIP = ({ registros }: GraficoCOSIPProps) => {
                       type="monotone" 
                       dataKey="faturado" 
                       stroke="#3b82f6" 
-                      strokeWidth={3} 
+                      strokeWidth={2} 
                       dot={{ r: 4, fill: '#3b82f6', stroke: '#1e293b', strokeWidth: 2 }}
-                      activeDot={{ r: 7, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+                      activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="arrecadado" 
                       stroke="#22c55e" 
-                      strokeWidth={3} 
+                      strokeWidth={2} 
                       dot={{ r: 4, fill: '#22c55e', stroke: '#1e293b', strokeWidth: 2 }}
-                      activeDot={{ r: 7, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
+                      activeDot={{ r: 6, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
               )}
             </div>
-            <div className="flex items-center justify-center gap-8 mt-3 pt-3 border-t border-border">
+            <div className="flex items-center justify-center gap-8 mt-4">
               <div className="flex items-center gap-2">
-                <div className="w-3.5 h-3.5 rounded-full bg-blue-500 shadow-sm" />
+                <div className="w-3 h-3 rounded-full bg-blue-500" />
                 <span className="text-sm text-muted-foreground">Faturado</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-sm" />
+                <div className="w-3 h-3 rounded-full bg-emerald-500" />
                 <span className="text-sm text-muted-foreground">Arrecadado</span>
               </div>
             </div>
           </TabsContent>
           
           <TabsContent value="clientes">
-            <div className="h-[280px]">
+            <div className="h-[300px]">
               {dadosClientes.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
                   Nenhum dado disponível
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={dadosClientes} margin={{ top: 10, right: 40, left: 10, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                  <LineChart data={dadosClientes} margin={{ top: 10, right: 50, left: 10, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
                     <XAxis 
                       dataKey="periodo" 
                       tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
@@ -181,17 +181,17 @@ export const GraficoCOSIP = ({ registros }: GraficoCOSIPProps) => {
                       type="monotone" 
                       dataKey="clientes" 
                       stroke="#8b5cf6" 
-                      strokeWidth={3} 
+                      strokeWidth={2} 
                       dot={{ r: 4, fill: '#8b5cf6', stroke: '#1e293b', strokeWidth: 2 }}
-                      activeDot={{ r: 7, stroke: '#8b5cf6', strokeWidth: 2, fill: '#fff' }}
+                      activeDot={{ r: 6, stroke: '#8b5cf6', strokeWidth: 2, fill: '#fff' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
               )}
             </div>
-            <div className="flex items-center justify-center gap-8 mt-3 pt-3 border-t border-border">
+            <div className="flex items-center justify-center gap-8 mt-4">
               <div className="flex items-center gap-2">
-                <div className="w-3.5 h-3.5 rounded-full bg-purple-500 shadow-sm" />
+                <div className="w-3 h-3 rounded-full bg-purple-500" />
                 <span className="text-sm text-muted-foreground">Clientes Faturados</span>
               </div>
             </div>

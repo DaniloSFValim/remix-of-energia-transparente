@@ -215,12 +215,9 @@ const Index = () => {
             </div>
 
             {/* Gráficos */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="space-y-6 mb-8">
               <GraficoEvolucaoConsumo registros={registrosFiltrados} />
               <GraficoValores registros={registrosFiltrados} />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <GraficoCustokWh registros={registrosFiltrados} />
               <GraficoCOSIP registros={registrosFiltrados} />
             </div>
