@@ -1,18 +1,27 @@
 import { Button } from '@/components/ui/button';
-import { Lightbulb, LayoutDashboard, MapPin, Sun, Moon, User, Lock } from 'lucide-react';
+import { Lightbulb, LayoutDashboard, MapPin, Sun, Moon, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Switch } from '@/components/ui/switch';
 
 export const NewHeader = () => {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved ? saved === 'dark' : true;
+  });
 
   useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
   };
 
   return (
@@ -45,10 +54,15 @@ export const NewHeader = () => {
           </div>
 
           {/* Ações */}
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
+              <Sun className={`h-4 w-4 transition-colors ${!isDark ? 'text-yellow-500' : 'text-muted-foreground'}`} />
+              <Switch
+                checked={isDark}
+                onCheckedChange={toggleTheme}
+              />
+              <Moon className={`h-4 w-4 transition-colors ${isDark ? 'text-primary' : 'text-muted-foreground'}`} />
+            </div>
             <Link to="/admin">
               <Button variant="outline" size="sm" className="gap-2">
                 <Lock className="h-4 w-4" />
