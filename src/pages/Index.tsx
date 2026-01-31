@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { NewHeader } from '@/components/dashboard/NewHeader';
 import { KPICardNew } from '@/components/dashboard/KPICardNew';
 import { IndicadoresCOSIP } from '@/components/dashboard/IndicadoresCOSIP';
+import { ResumoExecutivo } from '@/components/dashboard/ResumoExecutivo';
 import { GraficoEvolucaoConsumo } from '@/components/dashboard/GraficoEvolucaoConsumo';
 import { GraficoCOSIP } from '@/components/dashboard/GraficoCOSIP';
 import { GraficoBandeiras } from '@/components/dashboard/GraficoBandeiras';
@@ -280,42 +281,47 @@ const Index = () => {
               />
             </div>
 
-            {/* Indicadores COSIP */}
+            {/* Resumo Executivo */}
             <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+              <ResumoExecutivo registros={registrosFiltrados} />
+            </div>
+
+            {/* Indicadores COSIP */}
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
               <IndicadoresCOSIP registros={registrosFiltrados} />
             </div>
 
             {/* Gráficos */}
             <div className="space-y-6 mb-8">
-              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
                 <GraficoEvolucaoConsumo registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
               </div>
-              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
                 <GraficoValores registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
               </div>
-              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
                 <GraficoCustokWh registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
               </div>
-              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
                 <GraficoCOSIP registros={registrosFiltrados} />
               </div>
-              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '900ms' }}>
                 <GraficoBandeiras registros={registrosFiltrados} />
               </div>
             </div>
 
             {/* Análises COSIP */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '900ms' }}>
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1000ms' }}>
               <AnalisesCOSIP registros={registrosFiltrados} />
             </div>
 
             {/* Análises Automáticas */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1000ms' }}>
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1100ms' }}>
               <AnalisesAutomaticas registros={registrosFiltrados} />
             </div>
 
             {/* Tabela de Dados */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1100ms' }}>
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1200ms' }}>
               <TabelaDadosDetalhados registros={registrosFiltrados} />
             </div>
           </>
