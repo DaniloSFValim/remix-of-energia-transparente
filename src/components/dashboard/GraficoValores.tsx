@@ -4,9 +4,10 @@ import { RegistroEnergia, getMesAbreviado } from '@/types/energia';
 
 interface GraficoValoresProps {
   registros: RegistroEnergia[];
+  registrosComparacao?: RegistroEnergia[];
 }
 
-export const GraficoValores = ({ registros }: GraficoValoresProps) => {
+export const GraficoValores = ({ registros, registrosComparacao = [] }: GraficoValoresProps) => {
   const dados = registros.map(r => ({
     periodo: `${getMesAbreviado(r.mes)}/${String(r.ano).slice(2)}`,
     valor: Number(r.valor_pago),

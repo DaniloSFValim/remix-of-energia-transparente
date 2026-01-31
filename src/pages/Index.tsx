@@ -9,7 +9,7 @@ import { GraficoValores } from '@/components/dashboard/GraficoValores';
 import { AnalisesCOSIP } from '@/components/dashboard/AnalisesCOSIP';
 import { AnalisesAutomaticas } from '@/components/dashboard/AnalisesAutomaticas';
 import { TabelaDadosDetalhados } from '@/components/dashboard/TabelaDadosDetalhados';
-import { FiltrosPeriodo } from '@/components/dashboard/FiltrosPeriodo';
+import { FiltrosAvancados, FiltroAvancado } from '@/components/dashboard/FiltrosAvancados';
 import { PrintHeader } from '@/components/dashboard/PrintHeader';
 import { PrintFooter } from '@/components/dashboard/PrintFooter';
 import { useAllRegistros, useUltimoRegistro } from '@/hooks/useAllRegistros';
@@ -18,10 +18,25 @@ import { DollarSign, Zap, Calculator, Flag, BarChart3, Loader2, Calendar, HelpCi
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
+const FILTRO_INICIAL: FiltroAvancado = {
+  anoInicio: null,
+  mesInicio: null,
+  anoFim: null,
+  mesFim: null,
+  bandeira: 'todas',
+  compararCom: {
+    ativo: false,
+    anoInicio: null,
+    mesInicio: null,
+    anoFim: null,
+    mesFim: null,
+  },
+};
+
 const Index = () => {
   const { data: allRegistros = [], isLoading } = useAllRegistros();
   const { data: ultimoRegistro } = useUltimoRegistro();
-  const [filtro, setFiltro] = useState<string>('todos');
+  const [filtro, setFiltro] = useState<FiltroAvancado>(FILTRO_INICIAL);
 
   // Anos disponíveis
   const anosDisponiveis = useMemo(() => {
@@ -29,12 +44,56 @@ const Index = () => {
     return anos;
   }, [allRegistros]);
 
+  // Função para verificar se registro está no período
+  const registroNoPeriodo = (
+    registro: { ano: number; mes: number },
+    anoInicio: number | null,
+    mesInicio: number | null,
+    anoFim: number | null,
+    mesFim: number | null
+  ) => {
+    if (!anoInicio) return true;
+    
+    const dataRegistro = registro.ano * 100 + registro.mes;
+    const dataInicio = anoInicio * 100 + (mesInicio || 1);
+    const dataFim = (anoFim || anoInicio) * 100 + (mesFim || 12);
+    
+    return dataRegistro >= dataInicio && dataRegistro <= dataFim;
+  };
+
   // Registros filtrados
   const registrosFiltrados = useMemo(() => {
-    if (filtro === 'todos') return allRegistros;
-    const ano = parseInt(filtro);
-    return allRegistros.filter(r => r.ano === ano);
+    let resultado = allRegistros;
+    
+    // Filtro por período
+    if (filtro.anoInicio) {
+      resultado = resultado.filter(r => 
+        registroNoPeriodo(r, filtro.anoInicio, filtro.mesInicio, filtro.anoFim, filtro.mesFim)
+      );
+    }
+    
+    // Filtro por bandeira
+    if (filtro.bandeira !== 'todas') {
+      resultado = resultado.filter(r => r.bandeira_tarifaria === filtro.bandeira);
+    }
+    
+    return resultado;
   }, [allRegistros, filtro]);
+
+  // Registros do período de comparação
+  const registrosComparacao = useMemo(() => {
+    if (!filtro.compararCom.ativo || !filtro.compararCom.anoInicio) return [];
+    
+    return allRegistros.filter(r => 
+      registroNoPeriodo(
+        r, 
+        filtro.compararCom.anoInicio, 
+        filtro.compararCom.mesInicio, 
+        filtro.compararCom.anoFim, 
+        filtro.compararCom.mesFim
+      )
+    );
+  }, [allRegistros, filtro.compararCom]);
 
   // Último registro para KPIs
   const ultimoReg = registrosFiltrados.length > 0 
@@ -44,8 +103,9 @@ const Index = () => {
   // Registro anterior para comparação
   const registroAnterior = useMemo(() => {
     if (!ultimoReg) return null;
-    const idx = registrosFiltrados.findIndex(r => r.id === ultimoReg.id);
-    return idx > 0 ? registrosFiltrados[idx - 1] : null;
+    const sorted = [...registrosFiltrados].sort((a, b) => (b.ano * 100 + b.mes) - (a.ano * 100 + a.mes));
+    const idx = sorted.findIndex(r => r.id === ultimoReg.id);
+    return idx < sorted.length - 1 ? sorted[idx + 1] : null;
   }, [ultimoReg, registrosFiltrados]);
 
   // Registro do mesmo mês ano anterior
@@ -97,6 +157,10 @@ const Index = () => {
     ? new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
     : '';
 
+  const handleLimparFiltros = () => {
+    setFiltro(FILTRO_INICIAL);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -111,7 +175,7 @@ const Index = () => {
       
       <main className="container mx-auto px-4 py-6">
         {/* Cabeçalho de Impressão */}
-        <PrintHeader filtro={filtro} />
+        <PrintHeader filtro={filtro.anoInicio?.toString() || 'todos'} />
         {/* Título */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 no-print">
           <div className="flex-1">
@@ -138,11 +202,12 @@ const Index = () => {
               </p>
             )}
           </div>
-          <FiltrosPeriodo 
+          <FiltrosAvancados 
             filtro={filtro} 
             onFiltroChange={setFiltro} 
             anosDisponiveis={anosDisponiveis}
             registros={registrosFiltrados}
+            onLimparFiltros={handleLimparFiltros}
           />
         </div>
 
@@ -216,9 +281,9 @@ const Index = () => {
 
             {/* Gráficos */}
             <div className="space-y-6 mb-8">
-              <GraficoEvolucaoConsumo registros={registrosFiltrados} />
-              <GraficoValores registros={registrosFiltrados} />
-              <GraficoCustokWh registros={registrosFiltrados} />
+              <GraficoEvolucaoConsumo registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
+              <GraficoValores registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
+              <GraficoCustokWh registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
               <GraficoCOSIP registros={registrosFiltrados} />
             </div>
 
