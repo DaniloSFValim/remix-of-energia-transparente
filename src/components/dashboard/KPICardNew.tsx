@@ -2,6 +2,12 @@ import { LucideIcon, TrendingUp, TrendingDown, Minus, ArrowUp, ArrowDown, Chevro
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { LineChart, Line, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+
+interface SparklineData {
+  label: string;
+  valor: number;
+}
 
 interface KPICardNewProps {
   icon: LucideIcon;
@@ -17,7 +23,9 @@ interface KPICardNewProps {
   iconColor?: string;
   tooltipText?: string;
   index?: number;
-  inverterCor?: boolean; // Para métricas onde aumento é bom (ex: economia)
+  inverterCor?: boolean;
+  sparklineData?: SparklineData[];
+  sparklineColor?: string;
 }
 
 export const KPICardNew = ({
@@ -35,6 +43,8 @@ export const KPICardNew = ({
   tooltipText,
   index = 0,
   inverterCor = false,
+  sparklineData,
+  sparklineColor,
 }: KPICardNewProps) => {
   const getVariacaoColor = () => {
     if (variacao === null || variacao === undefined) return 'text-muted-foreground';
@@ -103,6 +113,16 @@ export const KPICardNew = ({
     if (absVariacao > 10) return 'Variação moderada';
     if (absVariacao > 5) return 'Variação leve';
     return 'Estável';
+  };
+
+  const getSparklineColor = () => {
+    if (iconColor.includes('emerald') || iconColor.includes('green')) return '#10b981';
+    if (iconColor.includes('blue')) return '#3b82f6';
+    if (iconColor.includes('purple') || iconColor.includes('violet')) return '#8b5cf6';
+    if (iconColor.includes('yellow') || iconColor.includes('amber')) return '#f59e0b';
+    if (iconColor.includes('orange')) return '#f97316';
+    if (iconColor.includes('red')) return '#ef4444';
+    return '#3b82f6';
   };
 
   const cardContent = (
@@ -225,6 +245,41 @@ export const KPICardNew = ({
             </div>
           )}
         </div>
+        
+        {/* Mini Sparkline */}
+        {sparklineData && sparklineData.length > 0 && (
+          <div className="h-10 mt-2 -mx-1 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={sparklineData}>
+                <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--popover))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px',
+                    fontSize: '11px',
+                    padding: '4px 8px',
+                  }}
+                  formatter={(value: number) => [
+                    new Intl.NumberFormat('pt-BR', {
+                      notation: 'compact',
+                      maximumFractionDigits: 1,
+                    }).format(value),
+                    ''
+                  ]}
+                  labelFormatter={(label) => label}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="valor"
+                  stroke={sparklineColor || getSparklineColor()}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 3, strokeWidth: 0 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
         
         {subtitulo && (
           <p className="text-xs text-muted-foreground mt-1.5 transition-opacity duration-300 group-hover:opacity-80">
