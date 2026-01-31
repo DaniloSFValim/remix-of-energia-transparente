@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { NewHeader } from '@/components/dashboard/NewHeader';
 import { KPICardNew } from '@/components/dashboard/KPICardNew';
 import { IndicadoresCOSIP } from '@/components/dashboard/IndicadoresCOSIP';
@@ -10,8 +10,10 @@ import { AnalisesCOSIP } from '@/components/dashboard/AnalisesCOSIP';
 import { AnalisesAutomaticas } from '@/components/dashboard/AnalisesAutomaticas';
 import { TabelaDadosDetalhados } from '@/components/dashboard/TabelaDadosDetalhados';
 import { FiltrosPeriodo } from '@/components/dashboard/FiltrosPeriodo';
+import { PrintHeader } from '@/components/dashboard/PrintHeader';
+import { PrintFooter } from '@/components/dashboard/PrintFooter';
 import { useAllRegistros, useUltimoRegistro } from '@/hooks/useAllRegistros';
-import { RegistroEnergia, getNomeMes, getNomeBandeira, getCorBandeira, isBandeiraComCusto } from '@/types/energia';
+import { getNomeBandeira, getCorBandeira, isBandeiraComCusto } from '@/types/energia';
 import { DollarSign, Zap, Calculator, Flag, BarChart3, Loader2, Calendar, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -108,8 +110,10 @@ const Index = () => {
       <NewHeader />
       
       <main className="container mx-auto px-4 py-6">
+        {/* Cabeçalho de Impressão */}
+        <PrintHeader filtro={filtro} />
         {/* Título */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-6 no-print">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-2xl md:text-3xl font-bold text-primary">
@@ -229,10 +233,13 @@ const Index = () => {
         )}
 
         {/* Footer */}
-        <footer className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground">
+        <footer className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground no-print">
           <p>Portal de Transparência - Iluminação Pública Municipal de Niterói</p>
           <p className="mt-1">Dados atualizados mensalmente pela Secretaria de Conservação e Serviços Públicos - SECONSER</p>
         </footer>
+
+        {/* Rodapé de Impressão */}
+        <PrintFooter />
       </main>
     </div>
   );
