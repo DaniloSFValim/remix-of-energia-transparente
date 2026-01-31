@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RegistroEnergia, getNomeMes, isBandeiraComCusto } from '@/types/energia';
-import { BarChart3, Flag, TrendingUp, Target, Trophy, AlertCircle } from 'lucide-react';
+import { BarChart3, Flag, TrendingUp, TrendingDown, Target, Trophy, AlertCircle } from 'lucide-react';
 
 interface AnalisesAutomaticasProps {
   registros: RegistroEnergia[];
@@ -80,129 +80,130 @@ export const AnalisesAutomaticas = ({ registros }: AnalisesAutomaticasProps) => 
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Análises Automáticas</h3>
+      <h3 className="text-lg font-semibold text-foreground">Análises Automáticas</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Resumo do Período */}
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart3 className="h-4 w-4 text-primary" />
-            <h4 className="font-medium">Resumo do Período</h4>
+        <Card className="p-5 bg-card border-border hover:border-primary/20 transition-colors">
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart3 className="h-4 w-4 text-blue-500" />
+            <h4 className="font-medium text-foreground">Resumo do Período</h4>
           </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Total consumido</span>
-              <span className="font-medium">{formatNumber(totalConsumo)} kWh</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Total consumido</span>
+              <span className="font-medium text-foreground">{formatNumber(totalConsumo)} kWh</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Total gasto</span>
-              <span className="font-medium text-primary">{formatCurrency(totalGasto)}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Total gasto</span>
+              <span className="font-medium text-emerald-400">{formatCurrency(totalGasto)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Custo médio</span>
-              <span className="font-medium">R$ {custoMedio.toFixed(2)}/kWh</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Custo médio</span>
+              <span className="font-medium text-foreground">R$ {custoMedio.toFixed(2)}/kWh</span>
             </div>
-            <div className="mt-3">
+            <div className="pt-2">
               <p className="text-muted-foreground text-xs mb-2">Bandeiras no período:</p>
               <div className="flex gap-2 flex-wrap">
-                <Badge className="bg-emerald-500 text-white">Verde: {bandeiraVerde}</Badge>
-                <Badge className="bg-yellow-500 text-black">Amarela: {bandeiraAmarela}</Badge>
-                <Badge className="bg-red-500 text-white">Vermelha: {bandeiraVermelha}</Badge>
+                <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white text-xs">Verde: {bandeiraVerde}</Badge>
+                <Badge className="bg-amber-500 hover:bg-amber-500 text-black text-xs">Amarela: {bandeiraAmarela}</Badge>
+                <Badge className="bg-red-600 hover:bg-red-600 text-white text-xs">Vermelha: {bandeiraVermelha}</Badge>
               </div>
             </div>
           </div>
         </Card>
 
         {/* Impacto das Bandeiras */}
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <Flag className="h-4 w-4 text-primary" />
-            <h4 className="font-medium">Impacto das Bandeiras</h4>
+        <Card className="p-5 bg-card border-border hover:border-primary/20 transition-colors">
+          <div className="flex items-center gap-2 mb-4">
+            <Flag className="h-4 w-4 text-amber-500" />
+            <h4 className="font-medium text-foreground">Impacto das Bandeiras</h4>
           </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Custo extra bandeiras</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Custo extra bandeiras</span>
               <span className="font-medium text-red-400">{formatCurrency(custoExtraBandeiras)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Se fosse tudo verde</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Se fosse tudo verde</span>
               <span className="font-medium text-emerald-400">Economia de {formatCurrency(custoExtraBandeiras)}</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground pt-1">
               {mesesComBandeira} meses com bandeira colorida geraram custos adicionais.
             </p>
           </div>
         </Card>
 
         {/* Evolução das Tarifas */}
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <h4 className="font-medium">Evolução das Tarifas</h4>
+        <Card className="p-5 bg-card border-border hover:border-primary/20 transition-colors">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="h-4 w-4 text-purple-500" />
+            <h4 className="font-medium text-foreground">Evolução das Tarifas</h4>
           </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Variação TUSD</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Variação TUSD</span>
               <span className={`font-medium ${variacaoTUSD > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
                 {variacaoTUSD > 0 ? '+' : ''}{variacaoTUSD.toFixed(1)}%
               </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Variação TE</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Variação TE</span>
               <span className={`font-medium ${variacaoTE > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
                 {variacaoTE > 0 ? '+' : ''}{variacaoTE.toFixed(1)}%
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground pt-1">
               Comparação do primeiro e último mês do período.
             </p>
           </div>
         </Card>
 
         {/* Padrões Identificados */}
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <Target className="h-4 w-4 text-primary" />
-            <h4 className="font-medium">Padrões Identificados</h4>
+        <Card className="p-5 bg-card border-border hover:border-primary/20 transition-colors">
+          <div className="flex items-center gap-2 mb-4">
+            <Target className="h-4 w-4 text-cyan-500" />
+            <h4 className="font-medium text-foreground">Padrões Identificados</h4>
           </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Maior consumo</span>
-              <span className="font-medium">{formatPeriodo(maiorConsumo)}</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Maior consumo</span>
+              <span className="font-medium text-foreground">{formatPeriodo(maiorConsumo)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Menor consumo</span>
-              <span className="font-medium">{formatPeriodo(menorConsumo)}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Menor consumo</span>
+              <span className="font-medium text-foreground">{formatPeriodo(menorConsumo)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tendência</span>
-              <span className={`font-medium ${tendenciaConsumo === 'Caindo' ? 'text-emerald-400' : 'text-red-400'}`}>
-                {tendenciaConsumo === 'Caindo' ? '↘' : '↗'} {tendenciaConsumo}
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Tendência</span>
+              <span className={`font-medium flex items-center gap-1 ${tendenciaConsumo === 'Caindo' ? 'text-emerald-400' : 'text-red-400'}`}>
+                {tendenciaConsumo === 'Caindo' ? <TrendingDown className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
+                {tendenciaConsumo}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Projeção próximo mês</span>
-              <span className="font-medium">{formatNumber(projecaoProximoMes)} kWh</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground text-sm">Projeção próximo mês</span>
+              <span className="font-medium text-foreground">{formatNumber(projecaoProximoMes)} kWh</span>
             </div>
           </div>
         </Card>
 
         {/* Top 3 Mais Econômicos */}
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <Trophy className="h-4 w-4 text-emerald-500" />
-            <h4 className="font-medium">Top 3 Mais Econômicos</h4>
+        <Card className="p-5 bg-card border-border hover:border-primary/20 transition-colors">
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="h-4 w-4 text-amber-500" />
+            <h4 className="font-medium text-foreground">Top 3 Mais Econômicos</h4>
           </div>
-          <div className="space-y-2 text-sm">
+          <div className="space-y-3">
             {top3Economicos.map((r, i) => (
               <div key={r.id} className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                    i === 0 ? 'bg-emerald-500 text-white' : i === 1 ? 'bg-emerald-400 text-white' : 'bg-emerald-300 text-black'
+                    i === 0 ? 'bg-amber-500 text-black' : i === 1 ? 'bg-gray-400 text-black' : 'bg-orange-700 text-white'
                   }`}>
                     {i + 1}
                   </span>
-                  <span className="text-muted-foreground">{formatPeriodo(r)}</span>
+                  <span className="text-muted-foreground text-sm">{formatPeriodo(r)}</span>
                 </div>
                 <span className="font-medium text-emerald-400">R$ {r.custokWh.toFixed(2)}/kWh</span>
               </div>
@@ -211,12 +212,12 @@ export const AnalisesAutomaticas = ({ registros }: AnalisesAutomaticasProps) => 
         </Card>
 
         {/* Top 3 Mais Caros */}
-        <Card className="p-4 bg-card border-border">
-          <div className="flex items-center gap-2 mb-3">
+        <Card className="p-5 bg-card border-border hover:border-primary/20 transition-colors">
+          <div className="flex items-center gap-2 mb-4">
             <AlertCircle className="h-4 w-4 text-red-500" />
-            <h4 className="font-medium">Top 3 Mais Caros</h4>
+            <h4 className="font-medium text-foreground">Top 3 Mais Caros</h4>
           </div>
-          <div className="space-y-2 text-sm">
+          <div className="space-y-3">
             {top3Caros.map((r, i) => (
               <div key={r.id} className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
@@ -225,7 +226,7 @@ export const AnalisesAutomaticas = ({ registros }: AnalisesAutomaticasProps) => 
                   }`}>
                     {i + 1}
                   </span>
-                  <span className="text-muted-foreground">{formatPeriodo(r)}</span>
+                  <span className="text-muted-foreground text-sm">{formatPeriodo(r)}</span>
                 </div>
                 <span className="font-medium text-red-400">R$ {r.custokWh.toFixed(2)}/kWh</span>
               </div>

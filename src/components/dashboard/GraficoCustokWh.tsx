@@ -34,11 +34,10 @@ export const GraficoCustokWh = ({ registros }: GraficoCustokWhProps) => {
       <circle 
         cx={cx} 
         cy={cy} 
-        r={5} 
+        r={4} 
         fill={fill} 
         stroke="#1e293b" 
         strokeWidth={2}
-        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}
       />
     );
   };
@@ -52,11 +51,6 @@ export const GraficoCustokWh = ({ registros }: GraficoCustokWhProps) => {
           <p className="text-lg font-bold text-purple-400">
             R$ {data.custo.toFixed(2)}/kWh
           </p>
-          {(data.isVermelho || data.isAmarelo) && (
-            <p className={`text-xs mt-1 ${data.isVermelho ? 'text-red-400' : 'text-yellow-400'}`}>
-              Bandeira {data.isVermelho ? 'Vermelha' : 'Amarela'}
-            </p>
-          )}
         </div>
       );
     }
@@ -64,21 +58,21 @@ export const GraficoCustokWh = ({ registros }: GraficoCustokWhProps) => {
   };
 
   return (
-    <Card className="animate-fade-in bg-card border-border hover:border-primary/30 transition-all duration-300">
+    <Card className="bg-card border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold">Evolução do Custo por kWh</CardTitle>
         <CardDescription>Custo médio por kWh (com impostos)</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[320px]">
+        <div className="h-[300px]">
           {dados.length === 0 ? (
             <div className="flex items-center justify-center h-full text-muted-foreground">
               Nenhum dado disponível
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dados} margin={{ top: 10, right: 40, left: 10, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+              <LineChart data={dados} margin={{ top: 10, right: 50, left: 10, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
                 <XAxis 
                   dataKey="periodo" 
                   tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
@@ -97,7 +91,7 @@ export const GraficoCustokWh = ({ registros }: GraficoCustokWhProps) => {
                   y={mediaCusto} 
                   stroke="hsl(var(--muted-foreground))" 
                   strokeDasharray="8 4"
-                  strokeWidth={1.5}
+                  strokeWidth={1}
                   label={{ 
                     value: 'Média', 
                     fill: 'hsl(var(--muted-foreground))', 
@@ -110,25 +104,25 @@ export const GraficoCustokWh = ({ registros }: GraficoCustokWhProps) => {
                   type="monotone" 
                   dataKey="custo" 
                   stroke="#a855f7" 
-                  strokeWidth={3}
+                  strokeWidth={2}
                   dot={<CustomDot />}
-                  activeDot={{ r: 8, stroke: '#a855f7', strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 6, stroke: '#a855f7', strokeWidth: 2, fill: '#fff' }}
                 />
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
-        <div className="flex items-center justify-center gap-8 mt-4 pt-3 border-t border-border">
+        <div className="flex items-center justify-center gap-8 mt-4">
           <div className="flex items-center gap-2">
-            <div className="w-3.5 h-3.5 rounded-full bg-purple-500 shadow-sm" />
+            <div className="w-3 h-3 rounded-full bg-purple-500" />
             <span className="text-sm text-muted-foreground">Custo por kWh</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3.5 h-3.5 rounded-full bg-yellow-500 shadow-sm" />
+            <div className="w-3 h-3 rounded-full bg-amber-500" />
             <span className="text-sm text-muted-foreground">Bandeira Amarela</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3.5 h-3.5 rounded-full bg-red-500 shadow-sm" />
+            <div className="w-3 h-3 rounded-full bg-red-500" />
             <span className="text-sm text-muted-foreground">Bandeira Vermelha</span>
           </div>
         </div>
