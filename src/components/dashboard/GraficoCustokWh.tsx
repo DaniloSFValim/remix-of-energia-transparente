@@ -59,9 +59,9 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
   };
 
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 group">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold">Evolução do Custo por kWh</CardTitle>
+        <CardTitle className="text-lg font-semibold transition-colors group-hover:text-primary">Evolução do Custo por kWh</CardTitle>
         <CardDescription>Custo médio por kWh (com impostos)</CardDescription>
       </CardHeader>
       <CardContent>
@@ -87,7 +87,7 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
                   tickCount={6}
                   axisLine={{ stroke: 'hsl(var(--border))' }}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeOpacity: 0.2, strokeWidth: 2 }} />
                 <ReferenceLine 
                   y={mediaCusto} 
                   stroke="hsl(var(--muted-foreground))" 
@@ -105,24 +105,26 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
                   type="monotone" 
                   dataKey="custo" 
                   stroke="#a855f7" 
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   dot={<CustomDot />}
-                  activeDot={{ r: 6, stroke: '#a855f7', strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 8, stroke: '#a855f7', strokeWidth: 3, fill: '#fff', className: 'drop-shadow-lg' }}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
                 />
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
         <div className="flex items-center justify-center gap-8 mt-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-purple-500" />
             <span className="text-sm text-muted-foreground">Custo por kWh</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-amber-500" />
             <span className="text-sm text-muted-foreground">Bandeira Amarela</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-red-500" />
             <span className="text-sm text-muted-foreground">Bandeira Vermelha</span>
           </div>

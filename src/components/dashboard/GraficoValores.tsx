@@ -62,9 +62,9 @@ export const GraficoValores = ({ registros, registrosComparacao = [] }: GraficoV
   };
 
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 group">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold">Evolução dos Valores</CardTitle>
+        <CardTitle className="text-lg font-semibold transition-colors group-hover:text-primary">Evolução dos Valores</CardTitle>
         <CardDescription>Valor pago mensalmente em R$</CardDescription>
       </CardHeader>
       <CardContent>
@@ -90,7 +90,7 @@ export const GraficoValores = ({ registros, registrosComparacao = [] }: GraficoV
                   tickCount={6}
                   axisLine={{ stroke: 'hsl(var(--border))' }}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeOpacity: 0.2, strokeWidth: 2 }} />
                 <ReferenceLine 
                   y={mediaValor} 
                   stroke="hsl(var(--muted-foreground))" 
@@ -108,24 +108,26 @@ export const GraficoValores = ({ registros, registrosComparacao = [] }: GraficoV
                   type="monotone" 
                   dataKey="valor" 
                   stroke="#22c55e" 
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   dot={<CustomDot />}
-                  activeDot={{ r: 6, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 8, stroke: '#22c55e', strokeWidth: 3, fill: '#fff', className: 'drop-shadow-lg' }}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
                 />
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
         <div className="flex items-center justify-center gap-8 mt-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-emerald-500" />
             <span className="text-sm text-muted-foreground">Dos Valores</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-amber-500" />
             <span className="text-sm text-muted-foreground">Bandeira Amarela</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-red-500" />
             <span className="text-sm text-muted-foreground">Bandeira Vermelha</span>
           </div>

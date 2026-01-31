@@ -223,6 +223,7 @@ const Index = () => {
                 variacaoLabel="vs mês anterior"
                 iconColor="text-emerald-500"
                 tooltipText="Valor total pago na fatura de energia do mês"
+                index={0}
               />
               <KPICardNew
                 icon={Zap}
@@ -232,6 +233,7 @@ const Index = () => {
                 variacaoLabel="vs mês anterior"
                 iconColor="text-blue-500"
                 tooltipText="Consumo total de energia em quilowatts-hora"
+                index={1}
               />
               <KPICardNew
                 icon={Calculator}
@@ -241,6 +243,7 @@ const Index = () => {
                 variacao={variacaoCusto}
                 iconColor="text-purple-500"
                 tooltipText="Custo médio por kWh incluindo todos os impostos e taxas"
+                index={2}
               />
               <KPICardNew
                 icon={Flag}
@@ -259,6 +262,7 @@ const Index = () => {
                 destaqueColor={ultimoReg.bandeira_tarifaria === 'amarela' ? 'yellow' : 'red'}
                 iconColor={ultimoReg.bandeira_tarifaria === 'amarela' ? 'text-yellow-500' : ultimoReg.bandeira_tarifaria?.includes('vermelha') ? 'text-red-500' : 'text-emerald-500'}
                 tooltipText="Bandeira tarifária aplicada pela ANEEL no período"
+                index={3}
               />
               <KPICardNew
                 icon={BarChart3}
@@ -271,34 +275,43 @@ const Index = () => {
                 variacao={variacaoAnualPercent}
                 iconColor="text-orange-500"
                 tooltipText="Comparação com o mesmo mês do ano anterior"
+                index={4}
               />
             </div>
 
             {/* Indicadores COSIP */}
-            <div className="mb-8">
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
               <IndicadoresCOSIP registros={registrosFiltrados} />
             </div>
 
             {/* Gráficos */}
             <div className="space-y-6 mb-8">
-              <GraficoEvolucaoConsumo registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
-              <GraficoValores registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
-              <GraficoCustokWh registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
-              <GraficoCOSIP registros={registrosFiltrados} />
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+                <GraficoEvolucaoConsumo registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
+              </div>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+                <GraficoValores registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
+              </div>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
+                <GraficoCustokWh registros={registrosFiltrados} registrosComparacao={registrosComparacao} />
+              </div>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
+                <GraficoCOSIP registros={registrosFiltrados} />
+              </div>
             </div>
 
             {/* Análises COSIP */}
-            <div className="mb-8">
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
               <AnalisesCOSIP registros={registrosFiltrados} />
             </div>
 
             {/* Análises Automáticas */}
-            <div className="mb-8">
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '900ms' }}>
               <AnalisesAutomaticas registros={registrosFiltrados} />
             </div>
 
             {/* Tabela de Dados */}
-            <div className="mb-8">
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1000ms' }}>
               <TabelaDadosDetalhados registros={registrosFiltrados} />
             </div>
           </>
