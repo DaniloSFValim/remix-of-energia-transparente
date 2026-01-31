@@ -2,8 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ComposedChart, Brush } from 'recharts';
 import { RegistroEnergia, getMesAbreviado } from '@/types/energia';
 import { useState } from 'react';
-import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FullscreenChart } from './FullscreenChart';
 
 interface GraficoEvolucaoConsumoProps {
   registros: RegistroEnergia[];
@@ -116,6 +117,47 @@ export const GraficoEvolucaoConsumo = ({ registros, registrosComparacao = [] }: 
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleReset} title="Resetar Zoom">
               <RotateCcw className="h-4 w-4" />
             </Button>
+            <FullscreenChart 
+              title="Evolução do Consumo" 
+              icon={<Zap className="h-5 w-5 text-blue-500" />}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={dados} margin={{ top: 20, right: 60, left: 20, bottom: 40 }}>
+                  <defs>
+                    <linearGradient id="colorConsumoFull" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
+                  <XAxis 
+                    dataKey="periodo" 
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    axisLine={{ stroke: 'hsl(var(--border))' }}
+                  />
+                  <YAxis 
+                    tickFormatter={formatYAxis}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    axisLine={{ stroke: 'hsl(var(--border))' }}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeDasharray: '5 5' }} />
+                  <ReferenceLine 
+                    y={mediaConsumo} 
+                    stroke="hsl(var(--muted-foreground))" 
+                    strokeDasharray="5 5" 
+                    label={{ value: `Média: ${formatYAxis(mediaConsumo)}`, fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="consumo" 
+                    stroke="#3b82f6" 
+                    strokeWidth={3}
+                    dot={<CustomDot />}
+                    activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2 }}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </FullscreenChart>
           </div>
         </div>
       </CardHeader>
