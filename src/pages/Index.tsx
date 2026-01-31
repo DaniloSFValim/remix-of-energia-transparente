@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { NewHeader } from '@/components/dashboard/NewHeader';
 import { KPICardNew } from '@/components/dashboard/KPICardNew';
 import { IndicadoresCOSIP } from '@/components/dashboard/IndicadoresCOSIP';
-import { ResumoExecutivo } from '@/components/dashboard/ResumoExecutivo';
 import { GraficoEvolucaoConsumo } from '@/components/dashboard/GraficoEvolucaoConsumo';
 import { GraficoCOSIP } from '@/components/dashboard/GraficoCOSIP';
 import { GraficoBandeiras } from '@/components/dashboard/GraficoBandeiras';
@@ -281,13 +280,8 @@ const Index = () => {
               />
             </div>
 
-            {/* Resumo Executivo */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-              <ResumoExecutivo registros={registrosFiltrados} />
-            </div>
-
             {/* Indicadores COSIP */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
               <IndicadoresCOSIP registros={registrosFiltrados} />
             </div>
 
