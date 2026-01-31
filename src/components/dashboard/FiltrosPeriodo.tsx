@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, Printer } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { FileSpreadsheet, FileText } from 'lucide-react';
 import { RegistroEnergia } from '@/types/energia';
@@ -14,8 +14,12 @@ interface FiltrosPeriodoProps {
 }
 
 export const FiltrosPeriodo = ({ filtro, onFiltroChange, anosDisponiveis, registros }: FiltrosPeriodoProps) => {
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 no-print">
       <Select value={filtro} onValueChange={onFiltroChange}>
         <SelectTrigger className="w-[180px] bg-card border-border">
           <SelectValue placeholder="Selecione o período" />
@@ -48,6 +52,11 @@ export const FiltrosPeriodo = ({ filtro, onFiltroChange, anosDisponiveis, regist
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <Button variant="outline" className="gap-2" onClick={handlePrint}>
+        <Printer className="h-4 w-4" />
+        Imprimir
+      </Button>
     </div>
   );
 };
