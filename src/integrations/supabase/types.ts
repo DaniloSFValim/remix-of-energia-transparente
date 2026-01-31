@@ -21,8 +21,12 @@ export type Database = {
             | Database["public"]["Enums"]["bandeira_tarifaria"]
             | null
           consumo_kwh: number
+          cosip_arrecadado: number | null
+          cosip_clientes: number | null
+          cosip_faturado: number | null
           created_at: string
           id: string
+          inadimplencia: number | null
           mes: number
           observacoes: string | null
           preco_bandeira: number | null
@@ -40,8 +44,12 @@ export type Database = {
             | Database["public"]["Enums"]["bandeira_tarifaria"]
             | null
           consumo_kwh: number
+          cosip_arrecadado?: number | null
+          cosip_clientes?: number | null
+          cosip_faturado?: number | null
           created_at?: string
           id?: string
+          inadimplencia?: number | null
           mes: number
           observacoes?: string | null
           preco_bandeira?: number | null
@@ -59,8 +67,12 @@ export type Database = {
             | Database["public"]["Enums"]["bandeira_tarifaria"]
             | null
           consumo_kwh?: number
+          cosip_arrecadado?: number | null
+          cosip_clientes?: number | null
+          cosip_faturado?: number | null
           created_at?: string
           id?: string
+          inadimplencia?: number | null
           mes?: number
           observacoes?: string | null
           preco_bandeira?: number | null
