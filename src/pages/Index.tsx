@@ -4,6 +4,7 @@ import { KPICardNew } from '@/components/dashboard/KPICardNew';
 import { IndicadoresCOSIP } from '@/components/dashboard/IndicadoresCOSIP';
 import { GraficoEvolucaoConsumo } from '@/components/dashboard/GraficoEvolucaoConsumo';
 import { GraficoCOSIP } from '@/components/dashboard/GraficoCOSIP';
+import { GraficoBandeiras } from '@/components/dashboard/GraficoBandeiras';
 import { GraficoCustokWh } from '@/components/dashboard/GraficoCustokWh';
 import { GraficoValores } from '@/components/dashboard/GraficoValores';
 import { AnalisesCOSIP } from '@/components/dashboard/AnalisesCOSIP';
@@ -298,20 +299,23 @@ const Index = () => {
               <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
                 <GraficoCOSIP registros={registrosFiltrados} />
               </div>
+              <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
+                <GraficoBandeiras registros={registrosFiltrados} />
+              </div>
             </div>
 
             {/* Análises COSIP */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '900ms' }}>
               <AnalisesCOSIP registros={registrosFiltrados} />
             </div>
 
             {/* Análises Automáticas */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '900ms' }}>
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1000ms' }}>
               <AnalisesAutomaticas registros={registrosFiltrados} />
             </div>
 
             {/* Tabela de Dados */}
-            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1000ms' }}>
+            <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '1100ms' }}>
               <TabelaDadosDetalhados registros={registrosFiltrados} />
             </div>
           </>
