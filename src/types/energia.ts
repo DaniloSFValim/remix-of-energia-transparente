@@ -14,6 +14,10 @@ export interface RegistroEnergia {
   preco_te: number | null;
   preco_tusd: number | null;
   preco_bandeira: number | null;
+  cosip_faturado: number | null;
+  cosip_arrecadado: number | null;
+  cosip_clientes: number | null;
+  inadimplencia: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -30,6 +34,10 @@ export interface RegistroEnergiaInsert {
   preco_te?: number;
   preco_tusd?: number;
   preco_bandeira?: number;
+  cosip_faturado?: number;
+  cosip_arrecadado?: number;
+  cosip_clientes?: number;
+  inadimplencia?: number;
 }
 
 export interface DadosKPI {
@@ -41,7 +49,7 @@ export interface DadosKPI {
 export const BANDEIRAS = [
   { valor: 'verde' as const, nome: 'Verde', cor: '#22c55e', descricao: 'Sem custo adicional' },
   { valor: 'amarela' as const, nome: 'Amarela', cor: '#eab308', descricao: 'Custo baixo' },
-  { valor: 'vermelha_1' as const, nome: 'Vermelha P1', cor: '#ef4444', descricao: 'Custo moderado' },
+  { valor: 'vermelha_1' as const, nome: 'Vermelha', cor: '#ef4444', descricao: 'Custo moderado' },
   { valor: 'vermelha_2' as const, nome: 'Vermelha P2', cor: '#dc2626', descricao: 'Custo alto' },
 ] as const;
 
@@ -72,6 +80,11 @@ export const MESES = [
 
 export const getNomeMes = (mes: number): string => {
   return MESES.find(m => m.valor === mes)?.nome || '';
+};
+
+export const getMesAbreviado = (mes: number): string => {
+  const nomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return nomes[mes - 1] || '';
 };
 
 export const isBandeiraComCusto = (bandeira: BandeiraTarifaria | null): boolean => {
