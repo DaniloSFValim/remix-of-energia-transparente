@@ -153,36 +153,6 @@ const Index = () => {
     ? Number(ultimoReg.preco_bandeira || 0) * Number(ultimoReg.consumo_kwh)
     : 0;
 
-  // Dados para sparklines (últimos 6 meses)
-  const sparklineData = useMemo(() => {
-    const sorted = [...registrosFiltrados].sort((a, b) => (a.ano * 100 + a.mes) - (b.ano * 100 + b.mes));
-    const ultimos6 = sorted.slice(-6);
-    
-    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    
-    return {
-      gasto: ultimos6.map(r => ({
-        label: `${meses[r.mes - 1]}/${r.ano}`,
-        valor: Number(r.valor_pago),
-      })),
-      consumo: ultimos6.map(r => ({
-        label: `${meses[r.mes - 1]}/${r.ano}`,
-        valor: Number(r.consumo_kwh),
-      })),
-      custokWh: ultimos6.map(r => ({
-        label: `${meses[r.mes - 1]}/${r.ano}`,
-        valor: Number(r.valor_pago) / Number(r.consumo_kwh),
-      })),
-      comparacaoAnual: ultimos6.map(r => {
-        const mesmoMesAnterior = allRegistros.find(reg => reg.mes === r.mes && reg.ano === r.ano - 1);
-        return {
-          label: `${meses[r.mes - 1]}/${r.ano}`,
-          valor: mesmoMesAnterior ? Number(r.valor_pago) - Number(mesmoMesAnterior.valor_pago) : 0,
-        };
-      }),
-    };
-  }, [registrosFiltrados, allRegistros]);
-
   // Data de atualização
   const dataAtualizacao = ultimoReg 
     ? new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
@@ -255,7 +225,6 @@ const Index = () => {
                 iconColor="text-emerald-500"
                 tooltipText="Valor total pago na fatura de energia do mês"
                 index={0}
-                sparklineData={sparklineData.gasto}
               />
               <KPICardNew
                 icon={Zap}
@@ -266,7 +235,6 @@ const Index = () => {
                 iconColor="text-blue-500"
                 tooltipText="Consumo total de energia em quilowatts-hora"
                 index={1}
-                sparklineData={sparklineData.consumo}
               />
               <KPICardNew
                 icon={Calculator}
@@ -277,7 +245,6 @@ const Index = () => {
                 iconColor="text-purple-500"
                 tooltipText="Custo médio por kWh incluindo todos os impostos e taxas"
                 index={2}
-                sparklineData={sparklineData.custokWh}
               />
               <KPICardNew
                 icon={Flag}
@@ -310,7 +277,6 @@ const Index = () => {
                 iconColor="text-orange-500"
                 tooltipText="Comparação com o mesmo mês do ano anterior"
                 index={4}
-                sparklineData={sparklineData.comparacaoAnual}
               />
             </div>
 
