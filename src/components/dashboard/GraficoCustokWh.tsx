@@ -4,9 +4,10 @@ import { RegistroEnergia, getMesAbreviado } from '@/types/energia';
 
 interface GraficoCustokWhProps {
   registros: RegistroEnergia[];
+  registrosComparacao?: RegistroEnergia[];
 }
 
-export const GraficoCustokWh = ({ registros }: GraficoCustokWhProps) => {
+export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: GraficoCustokWhProps) => {
   const dados = registros.map(r => {
     const custo = Number(r.valor_pago) / Number(r.consumo_kwh);
     return {
