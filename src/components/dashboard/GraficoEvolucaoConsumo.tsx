@@ -62,9 +62,9 @@ export const GraficoEvolucaoConsumo = ({ registros, registrosComparacao = [] }: 
   };
 
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 group">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold">Evolução do Consumo</CardTitle>
+        <CardTitle className="text-lg font-semibold transition-colors group-hover:text-primary">Evolução do Consumo</CardTitle>
         <CardDescription>Consumo mensal em kWh</CardDescription>
       </CardHeader>
       <CardContent>
@@ -76,6 +76,12 @@ export const GraficoEvolucaoConsumo = ({ registros, registrosComparacao = [] }: 
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={dados} margin={{ top: 10, right: 50, left: 10, bottom: 10 }}>
+                <defs>
+                  <linearGradient id="colorConsumo" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
                 <XAxis 
                   dataKey="periodo" 
@@ -90,7 +96,7 @@ export const GraficoEvolucaoConsumo = ({ registros, registrosComparacao = [] }: 
                   tickCount={6}
                   axisLine={{ stroke: 'hsl(var(--border))' }}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeOpacity: 0.2, strokeWidth: 2 }} />
                 <ReferenceLine 
                   y={mediaConsumo} 
                   stroke="hsl(var(--muted-foreground))" 
@@ -108,24 +114,26 @@ export const GraficoEvolucaoConsumo = ({ registros, registrosComparacao = [] }: 
                   type="monotone" 
                   dataKey="consumo" 
                   stroke="#3b82f6" 
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   dot={<CustomDot />}
-                  activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+                  activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 3, fill: '#fff', className: 'drop-shadow-lg' }}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
                 />
               </ComposedChart>
             </ResponsiveContainer>
           )}
         </div>
         <div className="flex items-center justify-center gap-8 mt-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-blue-500" />
             <span className="text-sm text-muted-foreground">Do Consumo</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-amber-500" />
             <span className="text-sm text-muted-foreground">Bandeira Amarela</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 transition-transform hover:scale-105 cursor-pointer">
             <div className="w-3 h-3 rounded-full bg-red-500" />
             <span className="text-sm text-muted-foreground">Bandeira Vermelha</span>
           </div>
