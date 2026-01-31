@@ -50,23 +50,25 @@ export const GraficoCOSIP = ({ registros }: GraficoCOSIPProps) => {
           </TabsList>
           
           <TabsContent value="faturamento">
-            <div className="h-[300px]">
+            <div className="h-[350px]">
               {dadosFaturamento.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
                   Nenhum dado disponível
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={dadosFaturamento} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <LineChart data={dadosFaturamento} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis 
                       dataKey="periodo" 
-                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                       interval="preserveStartEnd"
                     />
                     <YAxis 
                       tickFormatter={formatYAxis}
-                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                      domain={[(dataMin: number) => Math.floor(dataMin * 0.95), (dataMax: number) => Math.ceil(dataMax * 1.05)]}
+                      tickCount={8}
                     />
                     <Tooltip 
                       formatter={(value: number, name: string) => [
@@ -96,24 +98,25 @@ export const GraficoCOSIP = ({ registros }: GraficoCOSIPProps) => {
           </TabsContent>
           
           <TabsContent value="clientes">
-            <div className="h-[300px]">
+            <div className="h-[350px]">
               {dadosClientes.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
                   Nenhum dado disponível
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={dadosClientes} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <LineChart data={dadosClientes} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis 
                       dataKey="periodo" 
-                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                       interval="preserveStartEnd"
                     />
                     <YAxis 
                       tickFormatter={formatYAxis}
-                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
-                      domain={['dataMin - 5000', 'dataMax + 5000']}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                      domain={[(dataMin: number) => Math.floor(dataMin * 0.98), (dataMax: number) => Math.ceil(dataMax * 1.02)]}
+                      tickCount={8}
                     />
                     <Tooltip 
                       formatter={(value: number) => [
