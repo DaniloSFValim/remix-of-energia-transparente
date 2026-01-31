@@ -1,6 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Brush } from 'recharts';
 import { RegistroEnergia, getMesAbreviado } from '@/types/energia';
+import { useState } from 'react';
+import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface GraficoCustokWhProps {
   registros: RegistroEnergia[];
@@ -8,6 +11,8 @@ interface GraficoCustokWhProps {
 }
 
 export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: GraficoCustokWhProps) => {
+  const [brushIndex, setBrushIndex] = useState<{ startIndex?: number; endIndex?: number }>({});
+
   const dados = registros.map(r => {
     const custo = Number(r.valor_pago) / Number(r.consumo_kwh);
     return {
@@ -22,6 +27,38 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
   const mediaCusto = dados.length > 0 
     ? dados.reduce((acc, d) => acc + d.custo, 0) / dados.length 
     : 0;
+
+  const handleBrushChange = (newIndex: { startIndex?: number; endIndex?: number }) => {
+    setBrushIndex(newIndex);
+  };
+
+  const handleZoomIn = () => {
+    const dataLength = dados.length;
+    const currentStart = brushIndex.startIndex ?? 0;
+    const currentEnd = brushIndex.endIndex ?? dataLength - 1;
+    const range = currentEnd - currentStart;
+    const newRange = Math.max(2, Math.floor(range * 0.5));
+    const center = Math.floor((currentStart + currentEnd) / 2);
+    const newStart = Math.max(0, center - Math.floor(newRange / 2));
+    const newEnd = Math.min(dataLength - 1, newStart + newRange);
+    setBrushIndex({ startIndex: newStart, endIndex: newEnd });
+  };
+
+  const handleZoomOut = () => {
+    const dataLength = dados.length;
+    const currentStart = brushIndex.startIndex ?? 0;
+    const currentEnd = brushIndex.endIndex ?? dataLength - 1;
+    const range = currentEnd - currentStart;
+    const newRange = Math.min(dataLength - 1, Math.floor(range * 2));
+    const center = Math.floor((currentStart + currentEnd) / 2);
+    const newStart = Math.max(0, center - Math.floor(newRange / 2));
+    const newEnd = Math.min(dataLength - 1, newStart + newRange);
+    setBrushIndex({ startIndex: newStart, endIndex: newEnd });
+  };
+
+  const handleReset = () => {
+    setBrushIndex({});
+  };
 
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
@@ -61,8 +98,23 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
   return (
     <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/30 group">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold transition-colors group-hover:text-primary">Evolução do Custo por kWh</CardTitle>
-        <CardDescription>Custo médio por kWh (com impostos)</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold transition-colors group-hover:text-primary">Evolução do Custo por kWh</CardTitle>
+            <CardDescription>Custo médio por kWh (com impostos)</CardDescription>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleZoomIn} title="Zoom In">
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleZoomOut} title="Zoom Out">
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleReset} title="Resetar Zoom">
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -72,7 +124,7 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dados} margin={{ top: 10, right: 50, left: 10, bottom: 10 }}>
+              <LineChart data={dados} margin={{ top: 10, right: 50, left: 10, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
                 <XAxis 
                   dataKey="periodo" 
@@ -110,6 +162,16 @@ export const GraficoCustokWh = ({ registros, registrosComparacao = [] }: Grafico
                   activeDot={{ r: 8, stroke: '#a855f7', strokeWidth: 3, fill: '#fff', className: 'drop-shadow-lg' }}
                   animationDuration={1000}
                   animationEasing="ease-out"
+                />
+                <Brush
+                  dataKey="periodo"
+                  height={25}
+                  stroke="hsl(var(--primary))"
+                  fill="hsl(var(--muted))"
+                  startIndex={brushIndex.startIndex}
+                  endIndex={brushIndex.endIndex}
+                  onChange={handleBrushChange}
+                  tickFormatter={() => ''}
                 />
               </LineChart>
             </ResponsiveContainer>
